@@ -1,0 +1,120 @@
+import pygame
+
+class Button():
+
+    def __init__(self, text="", font="", pos=(0,0), text_size=20, color=(0, 255, 0)):
+        pygame.sprite.Sprite.__init__(self);
+
+        self.text = text;
+        self.font_name = font;
+        self.pos = pos;
+        self.text_size = text_size;
+        self.highlighted = False;
+        self.underline = False;
+        self.border = False;
+        self.border_color = (255, 255, 255);
+        self.padding = 0
+        self.border_thickness = 1
+
+    def draw(self, window):
+
+        if(self.highlighted):
+            color = self.h_color;
+            text_size = self.h_text_size;
+        else:
+            color = self.color;
+            text_size = self.text_size;
+
+        font = pygame.font.SysFont(self.font_name, size=text_size);
+        font.set_underline(self.underline);
+
+        text_image = font.render(self.text, True, color);
+
+        size = self.get_size();
+        draw_pos = (self.pos[0]-size[0]/2+self.padding, self.pos[1]-size[1]/2+self.padding);
+        window.blit(text_image, draw_pos);
+
+        if(self.border):
+            border_rect = (self.pos[0]-size[0]/2, self.pos[1]-size[1]/2, size[0], size[1]);
+            pygame.draw.rect(window, self.border_color, border_rect, self.border_thickness);
+
+    def highlight(self, scale, color):
+
+        self.highlighted = True;
+        if(color != None):
+            self.h_color = color;
+        else:
+            self.h_color = self.color;
+
+        print(self.h_color)
+
+        self.h_scale = scale
+        self.h_text_size = int(self.text_size+self.text_size*scale);
+
+    def remove_highlighting(self):
+        self.highlighted = False;
+
+    #Renvoie true si les coordonnées sont dans la hitbox du bouton
+    def in_bounds(self, x, y):
+
+        size = self.get_size();
+
+        xmin = self.pos[0] - size[0]/2;
+        xmax = self.pos[0] + size[0]/2;
+
+        ymin = self.pos[1] - size[1]/2;
+        ymax = self.pos[1] + size[1]/2;
+
+        print(xmin, xmax, ymin, ymax, x, y);
+
+        return (x >= xmin and x <= xmax and y >= ymin and y <= ymax);
+
+
+    #SETTERS/GETTERS
+    def set_text(self, text):
+        self.text = text;
+
+    def set_font(self, font_name):
+        self.font_name = font_name;
+
+    def set_text_size(self, text_size):
+        self.text_size = text_size;
+
+    def set_color(self, color):
+        self.color = color;
+
+    def set_pos(self, pos):
+        self.pos = pos;
+
+    def get_size(self):
+
+        if(self.highlighted):
+            text_size = self.h_text_size;
+        else:
+            text_size = self.text_size;
+
+        font = pygame.font.SysFont(self.font_name, size=text_size);
+        font.set_underline(self.underline);
+
+        img_text_size = font.size(self.text);
+        button_size = (img_text_size[0]+self.padding*2, img_text_size[1]+self.padding*2);
+
+        return button_size;
+
+    def get_text(self):
+        return self.text;
+
+    def set_underline(self, underline):
+        self.underline = underline;
+
+    def set_border(self, border):
+        self.border = border;
+
+    def set_border_color(self, color):
+        self.border_color = color
+
+    def set_padding(self, padding):
+        self.padding = padding;
+
+    def set_border_thickness(self, thickness):
+        self.border_thickness = thickness;
