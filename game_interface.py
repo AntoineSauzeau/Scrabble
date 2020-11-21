@@ -1,6 +1,7 @@
 from button import Button
 import pygame
 import os
+from game import GameStatus
 
 class GameInterface():
 
@@ -8,6 +9,7 @@ class GameInterface():
     BOARD_PADDING = 6;
 
     l_button = [];
+    l_img_letter = [];
 
     def __init__(self, interface, game):
 
@@ -31,22 +33,57 @@ class GameInterface():
         bttn_pick_new_letters.set_pos((interface_width/2, 670));
         bttn_pick_new_letters.set_underline(True);
 
-        bttn_next_round = Button();
-        bttn_next_round.set_text("Passer au tour suivant");
-        bttn_next_round.set_text_size(25);
-        bttn_next_round.set_color((255, 255, 255));
-        bttn_next_round.set_pos((870, 650));
-        bttn_next_round.set_padding(10);
-        bttn_next_round.set_border(True);
-        bttn_next_round.set_border_thickness(3);
+        self.bttn_next_round = Button();
+        self.bttn_next_round.set_text("Commencer la partie");
+        self.bttn_next_round.set_text_size(25);
+        self.bttn_next_round.set_color((255, 255, 255));
+        self.bttn_next_round.set_pos((970, 650));
+        self.bttn_next_round.set_padding(10);
+        self.bttn_next_round.set_border(True);
+        self.bttn_next_round.set_border_thickness(3);
+
+        bttn_pause = Button();
+        bttn_pause.set_text("Mettre en pause")
+        bttn_pause.set_text_size(26);
+        bttn_pause.set_color((255, 255, 255));
+        bttn_pause.set_pos((130, 300));
+
+        bttn_display_help = Button();
+        bttn_display_help.set_text("Afficher l'aide");
+        bttn_display_help.set_text_size(26);
+        bttn_display_help.set_color((255, 255, 255));
+        bttn_display_help.set_pos((130, 330));
+
+        bttn_return_to_menu = Button();
+        bttn_return_to_menu.set_text("Retour au menu principal");
+        bttn_return_to_menu.set_text_size(24);
+        bttn_return_to_menu.set_color((255, 255, 255));
+        bttn_return_to_menu.set_pos((130, 380));
 
         self.l_button.append(bttn_pick_new_letters);
-        self.l_button.append(bttn_next_round);
+        self.l_button.append(self.bttn_next_round);
+        self.l_button.append(bttn_pause);
+        self.l_button.append(bttn_display_help);
+        self.l_button.append(bttn_return_to_menu);
+
 
     def load_images(self):
 
         self.scrabble_board = pygame.image.load(os.path.join("Images", "scrabble_board.png"));
         self.scrabble_board = pygame.transform.scale(self.scrabble_board, (self.BOARD_SIZE, self.BOARD_SIZE));
+
+        for i in range(24):
+            img_letter_name = "letter_" + chr(65+i) + ".png"
+            img_letter_path = os.path.join("Images", "Letters", img_letter_name);
+
+            img_letter = pygame.image.load(img_letter_path);
+
+            case_size = int((self.BOARD_SIZE-self.BOARD_PADDING*2)/15);
+
+            self.l_img_letter.append(img_letter);
+
+            if(i == 1):
+                return
 
     def draw(self, window):
 
@@ -56,7 +93,7 @@ class GameInterface():
         interface_height = self.interface.GAME_WINDOW_HEIGHT;
 
         background_rect = (0, 0, interface_width, interface_height);
-        pygame.draw.rect(window, (41, 63, 20), background_rect);
+        pygame.draw.rect(window, (46, 40, 42), background_rect);
 
 
 
@@ -73,7 +110,7 @@ class GameInterface():
         easel_width = self.BOARD_SIZE/1.3;
         easel_height = easel_width/7;
 
-        letter_case_size = easel_width/7
+        letter_case_size = int(easel_width/7)
 
         font = pygame.font.SysFont("", size=20);
         for i in range(7):
@@ -85,11 +122,22 @@ class GameInterface():
 
             image_index_letter = font.render(str(i+1), True, (255, 255, 255));
 
-            image_size = font.size(str(i+1));
-            image_x = x+letter_case_size/2-image_size[0]/2
-            image_y = y+letter_case_size/2-image_size[1]/2
+            img_index_letter_size = font.size(str(i+1));
+            img_x = x+letter_case_size/2-img_index_letter_size[0]/2
+            img_y = y+letter_case_size/2-img_index_letter_size[1]/2
 
-            window.blit(image_index_letter, (image_x, image_y));
+            window.blit(image_index_letter, (img_x, img_y));
+
+            player_turn = self.game.get_player_turn();
+            if(player_turn != None):
+                letter_index = player_turn.get_easel()[i];
+
+                if(letter_index != -1):
+                    img_letter = self.l_img_letter[letter_index];
+                    img_letter = pygame.transform.scale(img_letter, (letter_case_size, letter_case_size));
+
+                    window.blit(img_letter,letter_case_rect);
+
 
 
 
@@ -98,7 +146,7 @@ class GameInterface():
         font = pygame.font.SysFont("", size=30);
         img_text_score = font.render("Score", True, (255, 255, 255));
 
-        window.blit(img_text_score, (800, 150));
+        window.blit(img_text_score, (865, 150));
 
         font = pygame.font.SysFont("", size=25);
 
@@ -111,11 +159,15 @@ class GameInterface():
             txt_score_player = player_name + ": " + str(player_score) + " points";
             img_text_score_player = font.render(txt_score_player, True, (255, 255, 255));
 
-            window.blit(img_text_score_player, (800, y));
+            window.blit(img_text_score_player, (865, y));
             y+=25;
 
 
         #PART DRAW BUTTONS
+
+        game_status = self.game.get_game_status();
+        if(game_status != GameStatus.NotStarted):
+            self.bttn_next_round.set_text("Passer au tour suivant");
 
         for button in self.l_button:
             button.draw(window);
@@ -150,22 +202,50 @@ class GameInterface():
             window.blit(img_grid_mark, (img_x, img_y));
 
 
-            #PART DRAW TIME
+        #PART DRAW TIME
 
-            font = pygame.font.SysFont("", size=25);
-            text_time_played = self.game.get_played_time_formatted();
+        font = pygame.font.SysFont("", size=25);
+        text_time_played = self.game.get_played_time_formatted();
 
-            img_text_time_played = font.render(text_time_played, True, (255, 255, 255));
-            window.blit(img_text_time_played, (10, 10));
+        img_text_time_played = font.render(text_time_played, True, (255, 255, 255));
+        window.blit(img_text_time_played, (10, 10));
 
 
+        #PART DRAW MENU
+
+        font = pygame.font.SysFont("", size=26);
+        img_text_menu = font.render("Menu de jeu", True, (255, 255, 255));
+
+        img_text_menu_size = img_text_menu.get_size();
+        img_text_menu_x = 130-img_text_menu_size[0]/2;
+        img_text_menu_y = 258-img_text_menu_size[1]/2;
+
+        window.blit(img_text_menu, (img_text_menu_x, img_text_menu_y));
+
+        line_start_pos = (130-img_text_menu_size[0]/2, 279);
+        line_end_pos = (130+img_text_menu_size[0]/2, 279);
+        pygame.draw.line(window, (255, 255, 255), line_start_pos, line_end_pos);
+
+        line_start_pos = (130-img_text_menu_size[0]/2, 355);
+        line_end_pos = (130+img_text_menu_size[0]/2, 355);
+        pygame.draw.line(window, (255, 255, 255), line_start_pos, line_end_pos);
+
+        menu_outline_rect = (15, 223, 222, 186);
+        pygame.draw.rect(window, (255, 255, 255), menu_outline_rect, 2);
+
+
+
+
+        player_turn = self.game.get_player_turn();
+        if(player_turn != None):
             font = pygame.font.SysFont("", size=25);
             img_txt_player_turn = font.render("C'est à Antoine de jouer !", True, (255, 255, 255));
 
             image_size = img_txt_player_turn.get_size();
-            window.blit(img_txt_player_turn, (870-image_size[0]/2, 600));
+            window.blit(img_txt_player_turn, (970-image_size[0]/2, 600));
 
 
+        #Pour le debug
         '''for x in range(0, 15):
             for y in range(0, 15):
                 board_rect = (self.BOARD_PADDING+x*case_size, self.BOARD_PADDING+y*case_size, case_size, case_size);
@@ -178,6 +258,14 @@ class GameInterface():
 
     def event(self, e):
 
-        self.interface.draw();
+        if(e.type == pygame.MOUSEBUTTONUP):
 
-        pass;
+            for button in self.l_button:
+
+                mouse_x = e.pos[0];
+                mouse_y = e.pos[1];
+
+                if(button.in_bounds(mouse_x, mouse_y)):
+
+                    if(button.get_text() == "Commencer la partie"):
+                        self.game.start_game();

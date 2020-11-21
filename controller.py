@@ -2,17 +2,25 @@ from interface import Interface
 import pygame
 from pygame.locals import *
 import time
+import threading
 
 
 class Controller():
 
-    def __init__(self):
-        print("Constructor Controller");
+    fps = 120
 
-    def start_loop(self):
+    def __init__(self):
+
+        print("Constructor Controller");
 
         self.exit = False;
 
+
+
+    #Boucle d'affichage
+    def start_loop(self):
+
+        clock = pygame.time.Clock();
         while(not(self.exit)):
 
             for event in pygame.event.get():
@@ -21,6 +29,11 @@ class Controller():
                     return;
 
                 self.interface.event(event);
+
+            self.interface.draw();
+
+            clock.tick(self.fps);
+
 
 
     def create_interface(self):

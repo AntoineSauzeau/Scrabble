@@ -14,7 +14,7 @@ class Interface:
     MENU_WINDOW_WIDTH = 379;
     MENU_WINDOW_HEIGHT = 600;
 
-    GAME_WINDOW_WIDTH = 1000;
+    GAME_WINDOW_WIDTH = 1100;
     GAME_WINDOW_HEIGHT = 700;
 
     def __init__(self, controller):
@@ -54,17 +54,14 @@ class Interface:
 
         if(page == Page.Menu):
 
-            self.window = pygame.display.set_mode((self.MENU_WINDOW_WIDTH, self.MENU_WINDOW_HEIGHT));
-
             self.page = page
-            self.menu.draw();
+            self.window = pygame.display.set_mode((self.MENU_WINDOW_WIDTH, self.MENU_WINDOW_HEIGHT));
 
         elif(page == Page.Game):
 
+            self.page = page
             self.window = pygame.display.set_mode((self.GAME_WINDOW_WIDTH, self.GAME_WINDOW_HEIGHT));
 
-            self.page = page
-            self.game.draw(self.window);
 
     #getters/setters
     def get_page():

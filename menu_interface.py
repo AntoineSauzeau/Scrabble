@@ -136,7 +136,6 @@ class MenuInterface():
                 else:
                     button.remove_highlighting();
 
-            self.interface.draw();
 
         elif(e.type == pygame.MOUSEBUTTONUP):
 
@@ -161,4 +160,3 @@ class MenuInterface():
     def change_page(page):
 
         self.page = page;
-        self.draw();
