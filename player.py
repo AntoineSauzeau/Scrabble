@@ -1,7 +1,7 @@
 class Player:
 
     score = 0
-    easel = [0, -1, -1, -1, -1, -1, -1]    #Stocke les lettres contenu dans le chevalet
+    easel = [0, 1, 2, 3, 4, 5, 6]    #Stocke les lettres contenu dans le chevalet
 
     def __init__(self, name):
         self.name = name;

@@ -81,3 +81,6 @@ class Game():
 
     def set_player_turn(player):
         self.player_turn = player;
+
+    def set_game_status(self, game_status):
+        self.game_status = game_status;
