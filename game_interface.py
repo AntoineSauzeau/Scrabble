@@ -2,19 +2,24 @@ from button import Button
 import pygame
 import os
 from game import GameStatus
+from shape import Shape
 
 class GameInterface():
 
     BOARD_SIZE = 550;
     BOARD_PADDING = 6;
 
-    l_button_to_draw = [];
-    l_img_letter = [];
-    picking_mode = False;           #Variable à True quand l'utilisateur est en train de choisir des lettres à dégager pour en piocher d'autres
-
     def __init__(self, interface, game):
 
-        print("Constructor Gameinterface");
+        print("Constructor GameInterface");
+
+        self.l_button_to_draw = [];
+        self.l_easel_case_rectangle = [];
+        self.l_img_letter = [];
+
+        self.picking_mode = False;           #Variable à True quand l'utilisateur est en train de choisir des lettres à dégager pour en piocher d'autres
+        self.letter_moving_mode = False;
+        self.letter_moving_index = -1;
 
         self.interface = interface;
         self.game = game;
@@ -76,7 +81,7 @@ class GameInterface():
         self.scrabble_board = pygame.image.load(os.path.join("Images", "scrabble_board.png"));
         self.scrabble_board = pygame.transform.scale(self.scrabble_board, (self.BOARD_SIZE, self.BOARD_SIZE));
 
-        for i in range(24):
+        for i in range(26):
             img_letter_name = "letter_" + chr(65+i) + ".png"
             img_letter_path = os.path.join("Images", "Letters", img_letter_name);
 
@@ -106,8 +111,27 @@ class GameInterface():
 
         window.blit(self.scrabble_board, (board_x, board_y));
 
+        game_board = self.game.get_game_board();
+
+        for case_x in range(15):
+            for case_y in range(15):
+
+                letter_index = game_board[case_x][case_y];
+                if(letter_index != -1):
+                    img_letter = self.l_img_letter[letter_index];
+
+                    img_letter_size = int(case_size);
+                    img_letter = pygame.transform.scale(img_letter, (img_letter_size, img_letter_size))
+
+                    img_letter_x = board_x + self.BOARD_PADDING + case_x*case_size+1;
+                    img_letter_y = board_y + self.BOARD_PADDING + case_y*case_size+2;
+
+                    window.blit(img_letter, (img_letter_x, img_letter_y));
+
 
         #PART DRAW EASEL
+
+        del self.l_easel_case_rectangle[:];
 
         easel_width = self.BOARD_SIZE/1.3;
         easel_height = easel_width/7;
@@ -120,7 +144,12 @@ class GameInterface():
             y = 585
 
             letter_case_rect = (x, y, letter_case_size, letter_case_size);
-            pygame.draw.rect(window, (255, 255, 255), letter_case_rect, 2);
+
+            letter_case_rectangle = Shape();
+            letter_case_rectangle.new_rectangle(window, (255, 255, 255), letter_case_rect, 2);
+            letter_case_rectangle.draw();
+
+            self.l_easel_case_rectangle.append(letter_case_rectangle);     #Pour avoir rapidement la dimension et la position de chaque case du chevalet au moment de gérer les évênements
 
             image_index_letter = font.render(str(i+1), True, (255, 255, 255));
 
@@ -240,12 +269,29 @@ class GameInterface():
         pygame.draw.rect(window, (255, 255, 255), menu_outline_rect, 2);
 
 
+        #DRAW MOVING LETTER
+        if(self.letter_moving_index != -1):
+            img_letter_moving = self.l_img_letter[self.letter_moving_index];
+            img_letter_moving_size = int(case_size);
 
+            img_letter_moving = pygame.transform.scale(img_letter_moving, (img_letter_moving_size, img_letter_moving_size));
+
+            mouse_pos = pygame.mouse.get_pos();
+            img_letter_moving_x = mouse_pos[0]-img_letter_moving_size/2
+            img_letter_moving_y = mouse_pos[1]-img_letter_moving_size/2
+
+            window.blit(img_letter_moving, (img_letter_moving_x, img_letter_moving_y));
+
+
+
+        #DRAW PART PLAYER TURN
 
         player_turn = self.game.get_player_turn();
         if(player_turn != None):
             font = pygame.font.SysFont("", size=25);
-            img_txt_player_turn = font.render("C'est à Antoine de jouer !", True, (255, 255, 255));
+
+            txt_player_turn = "C'est à " + player_turn.get_name() + " de jouer !";
+            img_txt_player_turn = font.render(txt_player_turn, True, (255, 255, 255));
 
             image_size = img_txt_player_turn.get_size();
             window.blit(img_txt_player_turn, (970-image_size[0]/2, 600));
@@ -280,6 +326,9 @@ class GameInterface():
 
     def event(self, e):
 
+        interface_width = self.interface.GAME_WINDOW_WIDTH;
+        interface_height = self.interface.GAME_WINDOW_HEIGHT;
+
         if(e.type == pygame.MOUSEBUTTONUP):
 
             for button in self.l_button_to_draw:
@@ -291,6 +340,8 @@ class GameInterface():
 
                     if(button.get_text() == "Commencer la partie"):
                         self.game.start_game();
+                        print(self.game.get_l_player()[0].get_easel());
+                        print(self.game.get_l_player()[1].get_easel());
 
                     elif(button.get_text() == "Retour au menu principal"):
                         self.interface.change_page(0);
@@ -303,6 +354,64 @@ class GameInterface():
 
                     elif(button.get_text() == "Piocher de nouvelles lettres"):
                         pass;
+
+                    elif(button.get_text() == "Passer au tour suivant"):
+                        self.game.next_round();
+                        pass
+
+
+                #Gestion du click au niveau du chevalet
+                for i in range(len(self.l_easel_case_rectangle)):
+
+                    easel_case_rectangle = self.l_easel_case_rectangle[i];
+
+                    if(easel_case_rectangle.in_bounds(mouse_x, mouse_y)):
+
+                        if(self.letter_moving_mode != True):
+
+                            self.letter_moving_mode = True;
+
+                            player = self.game.get_player_turn();
+                            easel = player.get_easel();
+
+                            self.letter_moving_index = easel[i];
+                            self.easel_start_case_index = i;
+                            easel[i] = -1;
+
+                        else:
+
+                            self.letter_moving_mode = False;
+
+                            player = self.game.get_player_turn();
+                            easel = player.get_easel();
+
+                            easel[self.easel_start_case_index] = easel[i];
+                            easel[i] = self.letter_moving_index;
+                            self.letter_moving_index = -1;
+
+
+                #Gestion du click au niveau du plateau de jeu
+                case_size = (self.BOARD_SIZE-self.BOARD_PADDING*2)/15;
+                for x_i in range(15):
+                    for y_i in range(15):
+
+                        board_x = interface_width/2-self.BOARD_SIZE/2;
+                        board_y = 21;
+
+                        case_x = board_x + self.BOARD_PADDING + x_i*case_size+1;
+                        case_y = board_y + self.BOARD_PADDING + y_i*case_size+2;
+
+                        letter_case_rectangle = Shape();
+                        letter_case_rectangle.new_rectangle(None, (255, 255, 255), (case_x, case_y, case_size, case_size));
+
+                        if(letter_case_rectangle.in_bounds(mouse_x, mouse_y)):
+
+                            if(self.letter_moving_index != -1):
+
+                                letter_placed = self.game.add_letter_to_game_board(x_i, y_i, self.letter_moving_index);
+                                if(letter_placed):
+                                    self.letter_moving_mode = False;
+                                    self.letter_moving_index = -1;
 
 
         elif(e.type == pygame.MOUSEMOTION):

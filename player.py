@@ -1,10 +1,21 @@
+
 class Player:
 
-    score = 0
-    easel = [0, 1, 2, 3, 4, 5, 6]    #Stocke les lettres contenu dans le chevalet
-
     def __init__(self, name):
+        
         self.name = name;
+        self.score = 0
+        self.easel = [-1, -1, -1, -1, -1, -1, -1]    #Stocke les lettres contenu dans le chevalet
+
+    #La fonction prend la liste des positions du chevalet à renouveller avec de nouvelles lettres piochées
+    def renew_easel(self, easel_index):
+
+            picked_letter = self.game.pick_a_letter();
+            picked_letter_index = ord(picked_letter)-65;
+
+            self.easel[easel_index] = picked_letter_index;
+            print(picked_letter_index);
+
 
     #getters/setters
     def get_score(self):
@@ -18,3 +29,6 @@ class Player:
 
     def set_score(self, score):
         self.score = score;
+
+    def set_game_instance(self, game):
+        self.game = game;

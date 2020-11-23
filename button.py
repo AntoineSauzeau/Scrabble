@@ -46,8 +46,6 @@ class Button():
         else:
             self.h_color = self.color;
 
-        print(self.h_color)
-
         self.h_scale = scale
         self.h_text_size = int(self.text_size+self.text_size*scale);
 
@@ -64,8 +62,6 @@ class Button():
 
         ymin = self.pos[1] - size[1]/2;
         ymax = self.pos[1] + size[1]/2;
-
-        print(xmin, xmax, ymin, ymax, x, y);
 
         return (x >= xmin and x <= xmax and y >= ymin and y <= ymax);
 

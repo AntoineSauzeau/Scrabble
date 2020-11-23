@@ -7,7 +7,7 @@ import threading
 
 class Controller():
 
-    fps = 120
+    FPS = 120
 
     def __init__(self):
 
@@ -16,8 +16,6 @@ class Controller():
         self.exit = False;
 
 
-
-    #Boucle d'affichage
     def start_loop(self):
 
         clock = pygame.time.Clock();
@@ -32,7 +30,7 @@ class Controller():
 
             self.interface.draw();
 
-            clock.tick(self.fps);
+            clock.tick(self.FPS);
 
 
 
