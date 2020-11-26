@@ -44,3 +44,12 @@ class Shape:
             y_max = y_min + self.rect[3];
 
             return (x_max >= x and x >= x_min and y_max >= y and y >= y_min);
+
+        elif(self.type == ShapeType.Line):
+
+            x_min = self.start_pos[0];
+            y_min = self.start_pos[1];
+            x_max = self.end_pos[0];
+            y_max = self.end_pos[1] + self.width;
+
+            return (x_max >= x and x >= x_min and y_max >= y and y >= y_min);

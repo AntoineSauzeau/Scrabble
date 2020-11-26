@@ -3,6 +3,7 @@ import threading
 import random
 import pdb
 from player import Player
+from word_checker import WordChecker
 
 class GameStatus(IntEnum):
     NotStarted = 0,
@@ -32,6 +33,7 @@ class Game():
 
         self.first_letter = True;
         self.l_case_modified_during_round = [];
+        self.word_checker = WordChecker(self);
 
         for player in l_player:
             player.set_game_instance(self);
@@ -78,16 +80,48 @@ class Game():
         if(not(self.is_valid_case_for_play(case_x, case_y))):
             return False;
 
-        self.l_case_modified_during_round.append((case_x, case_y));
+
+        #Si il y a une déjà une lettre on vérifie qu'elle n'a pas été posé pendant un autre tour
+        if(self.game_board[case_x][case_y] != -1):
+
+            if(len(self.l_case_modified_during_round) == 0):
+                return False;
+
+            for i in range(len(self.l_case_modified_during_round)):
+
+                case_modified = self.l_case_modified_during_round[i];
+                if(case_modified[0] == case_x and case_modified[1] == case_y):
+
+                    player = self.get_player_turn();
+                    i_first_free_place_easel = player.get_first_free_place_in_easel();
+                    player_easel = player.get_easel();
+
+                    #On remet la lettre déjà sur la case dans le chevalet pour la remplacer par la nouvelle lettre
+                    player_easel[i_first_free_place_easel] = self.game_board[case_x][case_y];
+
+                    break;
+
+                if(i == len(self.l_case_modified_during_round)-1):
+                    return False;
+
 
         self.game_board[case_x][case_y] = letter_index;
+
+        if(not((case_x, case_y) in self.l_case_modified_during_round)):
+            self.l_case_modified_during_round.append((case_x, case_y));
+
+        self.first_letter = False;
+
         return True;
 
 
     def next_round(self):
 
         self.n_round += 1;
-        self.l_case_modified_during_round.clear();
+
+        if(len(self.l_case_modified_during_round) != 0):
+            print(self.word_checker.is_valid_word());
+            self.l_case_modified_during_round.clear();
 
         if(self.player_index+1 == len(self.l_player)):
             self.player_index = 0;
@@ -148,8 +182,6 @@ class Game():
         letter = self.stack[0];     #La pioche est déjà mélangée dans il suffit de prendre de prendre le 1er index pour avoir une lettre "aléatoire"
         self.stack.pop(0);
 
-        #print(len(self.stack), letter);
-
         #En attendant d'implémenter les jokers
         if(letter == "?"):
             letter = "A";
@@ -161,11 +193,12 @@ class Game():
     #Renvoie True si on peut poser une lettre sur cette case
     def is_valid_case_for_play(self, case_x, case_y):
 
-        #Pour le premier round on regarde si le joueur a posé des lettres qu'il n'a pas encore validé, pour vérifier si au moins une lettre a été posé sur le plateau
-        first_letter = len(self.l_case_modified_during_round) == 0
-        if(self.n_round == 1 and first_letter == True):
+        #On fait attention à ce que la première lettre soit posé au milieu du plateau
+        if(self.first_letter == True):
             if(case_x != 7 or case_y != 7):
                 return False;
+
+        print(self.l_case_modified_during_round);
 
         #Le joueur a le droit de remplacer seulement les lettre posé pendant le tour actuel
         if(self.game_board[case_x][case_y] != -1):
@@ -178,10 +211,24 @@ class Game():
                 if(i == len(self.l_case_modified_during_round)-1):
                     return False;
 
+        #On vérifie qu'il y ait bien une lettre sur une des 4 cases autour
+        if(not(self.has_letter_around(case_x, case_y)) and self.first_letter != True):
+            return False;
+
         return True;
 
-    def has_letter_around():
-        pass;
+    def has_letter_around(self, case_x, case_y):
+
+        if(self.game_board[case_x-1][case_y] != -1):
+            return True;
+        elif(self.game_board[case_x][case_y-1] != -1):
+            return True;
+        elif(self.game_board[case_x+1][case_y] != -1):
+            return True;
+        elif(self.game_board[case_x][case_y+1] != -1):
+            return True;
+
+
 
 
 
@@ -236,3 +283,6 @@ class Game():
 
     def get_game_board(self):
         return self.game_board;
+
+    def get_l_case_modified_during_round(self):
+        return self.l_case_modified_during_round;

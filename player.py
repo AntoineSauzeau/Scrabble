@@ -2,7 +2,7 @@
 class Player:
 
     def __init__(self, name):
-        
+
         self.name = name;
         self.score = 0
         self.easel = [-1, -1, -1, -1, -1, -1, -1]    #Stocke les lettres contenu dans le chevalet
@@ -15,6 +15,14 @@ class Player:
 
             self.easel[easel_index] = picked_letter_index;
             print(picked_letter_index);
+
+    def get_first_free_place_in_easel(self):
+
+        for i in range(len(self.easel)):
+
+            letter_index = self.easel[i];
+            if(letter_index == -1):
+                return i;
 
 
     #getters/setters
