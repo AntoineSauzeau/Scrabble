@@ -32,12 +32,12 @@ class GameInterface():
         interface_width = self.interface.GAME_WINDOW_WIDTH;
         interface_height = self.interface.GAME_WINDOW_HEIGHT;
 
-        bttn_pick_new_letters = Button();
-        bttn_pick_new_letters.set_text("Piocher de nouvelles lettres");
-        bttn_pick_new_letters.set_text_size(24);
-        bttn_pick_new_letters.set_color((255, 255, 255));
-        bttn_pick_new_letters.set_pos((interface_width/2, 670));
-        bttn_pick_new_letters.set_underline(True);
+        self.bttn_pick_new_letters = Button();
+        self.bttn_pick_new_letters.set_text("Piocher de nouvelles lettres");
+        self.bttn_pick_new_letters.set_text_size(24);
+        self.bttn_pick_new_letters.set_color((255, 255, 255));
+        self.bttn_pick_new_letters.set_pos((interface_width/2, 670));
+        self.bttn_pick_new_letters.set_underline(True);
 
         self.bttn_next_round = Button();
         self.bttn_next_round.set_text("Commencer la partie");
@@ -69,7 +69,7 @@ class GameInterface():
         bttn_return_to_menu.set_pos((127, 380));
         bttn_return_to_menu.set_padding(8);
 
-        self.l_button_to_draw.append(bttn_pick_new_letters);
+        self.l_button_to_draw.append(self.bttn_pick_new_letters);
         self.l_button_to_draw.append(self.bttn_next_round);
         self.l_button_to_draw.append(self.bttn_pause);
         self.l_button_to_draw.append(bttn_display_help);
@@ -90,6 +90,9 @@ class GameInterface():
             case_size = int((self.BOARD_SIZE-self.BOARD_PADDING*2)/15);
 
             self.l_img_letter.append(img_letter);
+
+
+        self.img_loop = pygame.image.load(os.path.join("Images", "loop.png"));
 
 
     def draw(self, window):
@@ -159,9 +162,11 @@ class GameInterface():
 
             window.blit(image_index_letter, (img_x, img_y));
 
+            #On affiche les lettres dans les cases
             player_turn = self.game.get_player_turn();
             if(player_turn != None):
-                letter_index = player_turn.get_easel()[i];
+                player_easel = player_turn.get_easel();
+                letter_index = player_easel.get_l_letter()[i];
 
                 if(letter_index != -1):
                     img_letter = self.l_img_letter[letter_index];
@@ -173,7 +178,17 @@ class GameInterface():
                     letter_case_rect = (x+1, y+1, letter_case_size-2, letter_case_size-2);
                     window.blit(img_letter, letter_case_rect);
 
+            #Si il y a des lettres qui ont été désigné pour être échangé alors on marque ces lettres avec un signe
+            l_easel_case_to_renew = self.game.get_l_easel_case_to_renew();
+            if(i in l_easel_case_to_renew):
 
+                img_loop_size = int(case_size/1.8)
+                img_loop = pygame.transform.scale(self.img_loop, (img_loop_size, img_loop_size));
+
+                img_loop_x = letter_case_rect[0]+letter_case_rect[3]-img_loop_size-4;
+                img_loop_y = letter_case_rect[1]+3;
+
+                window.blit(img_loop, (img_loop_x, img_loop_y));
 
 
         #PART DRAW SCORE
@@ -199,10 +214,6 @@ class GameInterface():
 
 
         #PART DRAW BUTTONS
-
-        game_status = self.game.get_game_status();
-        if(game_status != GameStatus.NotStarted):
-            self.bttn_next_round.set_text("Passer au tour suivant");
 
         for button in self.l_button_to_draw:
             button.draw(window);
@@ -270,6 +281,7 @@ class GameInterface():
 
 
         #DRAW MOVING LETTER
+
         if(self.letter_moving_index != -1):
             img_letter_moving = self.l_img_letter[self.letter_moving_index];
             img_letter_moving_size = int(case_size);
@@ -336,12 +348,12 @@ class GameInterface():
                 mouse_x = e.pos[0];
                 mouse_y = e.pos[1];
 
+                #Gestion du click sur les boutons
                 if(button.in_bounds(mouse_x, mouse_y)):
 
                     if(button.get_text() == "Commencer la partie"):
                         self.game.start_game();
-                        print(self.game.get_l_player()[0].get_easel());
-                        print(self.game.get_l_player()[1].get_easel());
+                        self.bttn_next_round.set_text("Passer au tour suivant");
 
                     elif(button.get_text() == "Retour au menu principal"):
                         self.interface.change_page(0);
@@ -353,11 +365,31 @@ class GameInterface():
                         self.set_pause(False);
 
                     elif(button.get_text() == "Piocher de nouvelles lettres"):
-                        pass;
+
+                        self.bttn_next_round.set_text("Valider et piocher");
+                        self.bttn_pick_new_letters.set_text("Annuler");
+
+                        self.picking_mode = True;
+
+                    elif(button.get_text() == "Valider et piocher"):
+
+                        self.bttn_next_round.set_text("Passer au tour suivant");
+                        self.bttn_pick_new_letters.set_text("Piocher de nouvelles lettres");
+
+                        self.picking_mode = False;
+                        self.game.next_round();
+
+                    elif(button.get_text() == "Annuler"):
+
+                        self.bttn_next_round.set_text("Passer au tour suivant");
+                        self.bttn_pick_new_letters.set_text("Piocher de nouvelles lettres");
+
+                        self.picking_mode = False;
+                        l_easel_case_to_renew = self.game.get_l_easel_case_to_renew();
+                        l_easel_case_to_renew.clear();
 
                     elif(button.get_text() == "Passer au tour suivant"):
                         self.game.next_round();
-                        pass
 
 
                 #Gestion du click au niveau du chevalet
@@ -367,27 +399,42 @@ class GameInterface():
 
                     if(easel_case_rectangle.in_bounds(mouse_x, mouse_y)):
 
-                        if(self.letter_moving_mode != True):
+                        if(self.picking_mode):
 
-                            self.letter_moving_mode = True;
+                            l_easel_case_to_renew = self.game.get_l_easel_case_to_renew();
 
-                            player = self.game.get_player_turn();
-                            easel = player.get_easel();
-
-                            self.letter_moving_index = easel[i];
-                            self.easel_start_case_index = i;
-                            easel[i] = -1;
+                            if(not(i in l_easel_case_to_renew)):
+                                l_easel_case_to_renew.append(i);
+                            else:
+                                l_easel_case_to_renew.remove(i);
 
                         else:
 
-                            self.letter_moving_mode = False;
+                            if(self.letter_moving_mode != True):
 
-                            player = self.game.get_player_turn();
-                            easel = player.get_easel();
+                                self.letter_moving_mode = True;
 
-                            easel[self.easel_start_case_index] = easel[i];
-                            easel[i] = self.letter_moving_index;
-                            self.letter_moving_index = -1;
+                                player = self.game.get_player_turn();
+
+                                easel = player.get_easel();
+                                easel_l_letter = easel.get_l_letter();
+
+                                self.letter_moving_index = easel_l_letter[i];
+                                self.easel_start_case_index = i;
+                                easel_l_letter[i] = -1;
+
+                            else:
+
+                                self.letter_moving_mode = False;
+
+                                player = self.game.get_player_turn();
+
+                                easel = player.get_easel();
+                                easel_l_letter = easel.get_l_letter();
+
+                                easel_l_letter[self.easel_start_case_index] = easel_l_letter[i];
+                                easel_l_letter[i] = self.letter_moving_index;
+                                self.letter_moving_index = -1;
 
 
                 #Gestion du click au niveau du plateau de jeu

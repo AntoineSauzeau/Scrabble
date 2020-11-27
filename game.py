@@ -11,6 +11,12 @@ class GameStatus(IntEnum):
     Paused = 2,
     Finished = 3
 
+class CaseType(IntEnum):
+    WT = 0,
+    WD = 1,
+    LT = 2,
+    LD = 3
+
 class Game():
 
     def __init__(self, l_player):
@@ -22,8 +28,11 @@ class Game():
         self.l_case_LT = [[1,5],[1,9],[5,1],[5,5],[5,9],[5,13],[9,1],[9,5],[9,9],[9,13],[13,5],[13,9]]
         self.l_case_LD = [[0,3],[0,11],[2,6],[2,8],[3,0],[3,7],[3,14],[6,2],[6,6],[6,8],[6,12],[7,3],[7,11],[8,2],[8,6],[8,8],[8,12],[11,0],[11,7],[11,14],[12,6],[12,8],[14,3],[14,11]]
 
+        self.l_case_bonus_covered = [];
+        self.l_easel_case_to_renew = [];
+
         self.played_time = 0;   #En seconde
-        self.n_round = 1
+        self.n_round = 1;
         self.player_index = 0;            #Stocke l'utilisateur qui joue
         self.game_status = GameStatus.NotStarted;
 
@@ -58,8 +67,8 @@ class Game():
             player.set_game_instance(self);
 
         for player in self.l_player:
-            for i in range(7):
-                player.renew_easel(i);
+            easel = player.get_easel();
+            easel.fill();
 
         self.loop_timer();
 
@@ -93,11 +102,13 @@ class Game():
                 if(case_modified[0] == case_x and case_modified[1] == case_y):
 
                     player = self.get_player_turn();
-                    i_first_free_place_easel = player.get_first_free_place_in_easel();
                     player_easel = player.get_easel();
 
+                    i_first_free_place_easel = player_easel.get_first_free_place();
+                    l_letter_easel = player_easel.get_l_letter();
+
                     #On remet la lettre déjà sur la case dans le chevalet pour la remplacer par la nouvelle lettre
-                    player_easel[i_first_free_place_easel] = self.game_board[case_x][case_y];
+                    l_letter_easel[i_first_free_place_easel] = self.game_board[case_x][case_y];
 
                     break;
 
@@ -114,14 +125,45 @@ class Game():
 
         return True;
 
+    def remove_letter_on_game_board(self, l_letter_pos):
+
+        for letter_pos in l_letter_pos:
+            letter_x = letter_pos[0];
+            letter_y = letter_pos[1];
+
+            self.game_board[letter_x][letter_y] = -1;
+
+        if(self.game_board[7][7] == -1):
+            self.first_letter = True;
+
 
     def next_round(self):
 
         self.n_round += 1;
+        player = self.l_player[self.player_index];
 
         if(len(self.l_case_modified_during_round) != 0):
+
             print(self.word_checker.is_valid_word());
-            self.l_case_modified_during_round.clear();
+
+            if(self.word_checker.is_valid_word()):
+                total_value_placed = self.word_checker.count_total_placed_value();
+                self.desactivate_covered_bonus();
+
+                player.add_score(total_value_placed);
+
+            else:
+                self.remove_letter_on_game_board(self.l_case_modified_during_round);
+
+        for case_index in self.l_easel_case_to_renew:
+            easel = player.get_easel();
+            easel.renew_letter(case_index);
+
+        self.l_easel_case_to_renew.clear();
+
+        self.l_case_modified_during_round.clear();
+        easel = player.get_easel();
+        easel.fill();
 
         if(self.player_index+1 == len(self.l_player)):
             self.player_index = 0;
@@ -188,6 +230,29 @@ class Game():
 
         return letter;
 
+    def get_case_type(self, case_x, case_y):
+
+        for case in self.l_case_LT:
+            if(case[0] == case_x and case[1] == case_y):
+                return CaseType.LT;
+
+        for case in self.l_case_LD:
+            if(case[0] == case_x and case[1] == case_y):
+                return CaseType.LD;
+
+        for case in self.l_case_WT:
+            if(case[0] == case_x and case[1] == case_y):
+                return CaseType.WT;
+
+        for case in self.l_case_WD:
+            if(case[0] == case_x and case[1] == case_y):
+                return CaseType.WD;
+
+    def is_case_bonus(self, case_x, case_y):
+
+        case_type = self.get_case_type(case_x, case_y);
+
+        return (case_type == CaseType.LD or case_type == CaseType.LT or case_type == CaseType.WD or case_type == CaseType.WT);
 
 
     #Renvoie True si on peut poser une lettre sur cette case
@@ -228,6 +293,14 @@ class Game():
         elif(self.game_board[case_x][case_y+1] != -1):
             return True;
 
+
+    def desactivate_covered_bonus(self):
+
+        for x in range(15):
+            for y in range(15):
+
+                if(self.is_case_bonus(x, y)):
+                    self.l_case_bonus_covered.append([x, y]);
 
 
 
@@ -286,3 +359,9 @@ class Game():
 
     def get_l_case_modified_during_round(self):
         return self.l_case_modified_during_round;
+
+    def get_l_letter_information(self):
+        return self.l_letter_information;
+
+    def get_l_easel_case_to_renew(self):
+        return self.l_easel_case_to_renew;
