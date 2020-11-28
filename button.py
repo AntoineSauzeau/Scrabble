@@ -2,7 +2,7 @@ import pygame
 
 class Button():
 
-    def __init__(self, text="", font="", pos=(0,0), text_size=20, color=(0, 255, 0)):
+    def __init__(self, text="", font="", pos=(0,0), text_size=20, color=(255, 255, 255)):
         pygame.sprite.Sprite.__init__(self);
 
         self.text = text;
@@ -15,6 +15,7 @@ class Button():
         self.border_color = (255, 255, 255);
         self.padding = 0
         self.border_thickness = 1
+        self.color = color;
 
     def draw(self, window):
 
@@ -65,6 +66,21 @@ class Button():
 
         return (x >= xmin and x <= xmax and y >= ymin and y <= ymax);
 
+    def get_size(self):
+
+        if(self.highlighted):
+            text_size = self.h_text_size;
+        else:
+            text_size = self.text_size;
+
+        font = pygame.font.SysFont(self.font_name, size=text_size);
+        font.set_underline(self.underline);
+
+        img_text_size = font.size(self.text);
+        button_size = (img_text_size[0]+self.padding*2, img_text_size[1]+self.padding*2);
+
+        return button_size;
+
 
     #SETTERS/GETTERS
     def set_text(self, text):
@@ -81,21 +97,6 @@ class Button():
 
     def set_pos(self, pos):
         self.pos = pos;
-
-    def get_size(self):
-
-        if(self.highlighted):
-            text_size = self.h_text_size;
-        else:
-            text_size = self.text_size;
-
-        font = pygame.font.SysFont(self.font_name, size=text_size);
-        font.set_underline(self.underline);
-
-        img_text_size = font.size(self.text);
-        button_size = (img_text_size[0]+self.padding*2, img_text_size[1]+self.padding*2);
-
-        return button_size;
 
     def get_text(self):
         return self.text;
