@@ -3,6 +3,11 @@ import pygame
 import os
 from game import GameStatus
 from shape import Shape
+from enum import IntEnum
+
+class Page(IntEnum):
+    Game = 0,
+    Save = 1
 
 class GameInterface():
 
@@ -13,7 +18,7 @@ class GameInterface():
 
         print("Constructor GameInterface");
 
-        self.l_button_to_draw = [];
+        self.l_button_to_draw_by_page = [[], []];
         self.l_easel_case_rectangle = [];
         self.l_img_letter = [];
 
@@ -24,10 +29,14 @@ class GameInterface():
         self.interface = interface;
         self.game = game;
 
-        self.init_graphic_elements();
+        self.page = Page.Game;
+
+        self.init_game_page();
+        self.init_save_page();
+
         self.load_images();
 
-    def init_graphic_elements(self):
+    def init_game_page(self):
 
         interface_width = self.interface.GAME_WINDOW_WIDTH;
         interface_height = self.interface.GAME_WINDOW_HEIGHT;
@@ -69,11 +78,54 @@ class GameInterface():
         bttn_return_to_menu.set_pos((127, 380));
         bttn_return_to_menu.set_padding(8);
 
-        self.l_button_to_draw.append(self.bttn_pick_new_letters);
-        self.l_button_to_draw.append(self.bttn_next_round);
-        self.l_button_to_draw.append(self.bttn_pause);
-        self.l_button_to_draw.append(bttn_display_help);
-        self.l_button_to_draw.append(bttn_return_to_menu);
+        page = Page.Game;
+        self.l_button_to_draw_by_page[page].append(self.bttn_pick_new_letters);
+        self.l_button_to_draw_by_page[page].append(self.bttn_next_round);
+        self.l_button_to_draw_by_page[page].append(self.bttn_pause);
+        self.l_button_to_draw_by_page[page].append(bttn_display_help);
+        self.l_button_to_draw_by_page[page].append(bttn_return_to_menu);
+
+    def init_save_page(self):
+
+        interface_width = self.interface.GAME_WINDOW_WIDTH;
+        interface_height = self.interface.GAME_WINDOW_HEIGHT;
+
+        bttn_save = Button("Sauvegarder la partie");
+        bttn_save.set_color((0, 0, 0));
+        bttn_save.set_background_color((255, 255, 255));
+        bttn_save.set_pos((interface_width/2, 330));
+        bttn_save.set_padding(10);
+        bttn_save.set_text_size(24);
+        bttn_save.set_border(True);
+        bttn_save.set_border_color((0, 224, 73));
+        bttn_save.set_border_thickness(3);
+
+        bttn_dont_save = Button("Quitter sans sauvegarder");
+        bttn_dont_save.set_color((0, 0, 0));
+        bttn_dont_save.set_background_color((255, 255, 255));
+        bttn_dont_save.set_pos((interface_width/2, 440));
+        bttn_dont_save.set_padding(10);
+        bttn_dont_save.set_text_size(24);
+        bttn_dont_save.set_border(True);
+        bttn_dont_save.set_border_color((0, 224, 73));
+        bttn_dont_save.set_border_thickness(3);
+
+        bttn_cancel = Button("Retour au jeu");
+        bttn_cancel.set_color((0, 0, 0));
+        bttn_cancel.set_background_color((255, 255, 255));
+        bttn_cancel.set_pos((interface_width/2, 500));
+        bttn_cancel.set_padding(10);
+        bttn_cancel.set_text_size(24);
+        bttn_cancel.set_border(True);
+        bttn_cancel.set_border_color((0, 224, 73));
+        bttn_cancel.set_border_thickness(3);
+
+
+
+        page = Page.Save;
+        self.l_button_to_draw_by_page[page].append(bttn_save);
+        self.l_button_to_draw_by_page[page].append(bttn_cancel);
+        self.l_button_to_draw_by_page[page].append(bttn_dont_save);
 
 
     def load_images(self):
@@ -93,9 +145,17 @@ class GameInterface():
 
 
         self.img_loop = pygame.image.load(os.path.join("Images", "loop.png"));
+        self.img_background_save = pygame.image.load(os.path.join("Images", "background_save.png"));
 
 
     def draw(self, window):
+
+        if(self.page == Page.Game):
+            self.draw_game_page(window);
+        elif(self.page == Page.Save):
+            self.draw_save_page(window);
+
+    def draw_game_page(self, window):
 
         case_size = (self.BOARD_SIZE-self.BOARD_PADDING*2)/15
 
@@ -215,7 +275,7 @@ class GameInterface():
 
         #PART DRAW BUTTONS
 
-        for button in self.l_button_to_draw:
+        for button in self.l_button_to_draw_by_page[self.page]:
             button.draw(window);
 
 
@@ -319,6 +379,27 @@ class GameInterface():
 
         pygame.display.flip();
 
+    def draw_save_page(self, window):
+
+        interface_width = self.interface.GAME_WINDOW_WIDTH;
+        interface_height = self.interface.GAME_WINDOW_HEIGHT;
+
+        img_background_save = pygame.transform.scale(self.img_background_save, (interface_width, interface_height));
+        window.blit(img_background_save, (0, 0));
+
+        font = pygame.font.SysFont("", size=38);
+        img_save_title = font.render("Voulez vous sauvegarder avant de quitter ?", True, (255, 255, 255));
+
+        img_save_title_size = img_save_title.get_size();
+        img_save_title_x = interface_width/2 - img_save_title_size[0]/2;
+
+        window.blit(img_save_title, (img_save_title_x, 200));
+
+        for button in self.l_button_to_draw_by_page[self.page]:
+            button.draw(window);
+
+        pygame.display.flip();
+
 
     def set_pause(self, pause):
 
@@ -343,7 +424,7 @@ class GameInterface():
 
         if(e.type == pygame.MOUSEBUTTONUP):
 
-            for button in self.l_button_to_draw:
+            for button in self.l_button_to_draw_by_page[self.page]:
 
                 mouse_x = e.pos[0];
                 mouse_y = e.pos[1];
@@ -351,45 +432,67 @@ class GameInterface():
                 #Gestion du click sur les boutons
                 if(button.in_bounds(mouse_x, mouse_y)):
 
-                    if(button.get_text() == "Commencer la partie"):
-                        self.game.start_game();
-                        self.bttn_next_round.set_text("Passer au tour suivant");
+                    if(self.page == Page.Game):
 
-                    elif(button.get_text() == "Retour au menu principal"):
-                        self.interface.change_page(0);
+                        if(button.get_text() == "Commencer la partie"):
+                            self.game.start_game();
+                            self.bttn_next_round.set_text("Passer au tour suivant");
 
-                    elif(button.get_text() == "Mettre en pause"):
-                        self.set_pause(True);
+                        elif(button.get_text() == "Retour au menu principal"):
+                            self.page = Page.Save;
 
-                    elif(button.get_text() == "Reprendre la partie"):
-                        self.set_pause(False);
+                        elif(button.get_text() == "Mettre en pause"):
+                            self.set_pause(True);
 
-                    elif(button.get_text() == "Piocher de nouvelles lettres"):
+                        elif(button.get_text() == "Reprendre la partie"):
+                            self.set_pause(False);
 
-                        self.bttn_next_round.set_text("Valider et piocher");
-                        self.bttn_pick_new_letters.set_text("Annuler");
+                        elif(button.get_text() == "Piocher de nouvelles lettres"):
 
-                        self.picking_mode = True;
+                            self.bttn_next_round.set_text("Valider et piocher");
+                            self.bttn_pick_new_letters.set_text("Annuler");
 
-                    elif(button.get_text() == "Valider et piocher"):
+                            self.picking_mode = True;
 
-                        self.bttn_next_round.set_text("Passer au tour suivant");
-                        self.bttn_pick_new_letters.set_text("Piocher de nouvelles lettres");
+                        elif(button.get_text() == "Valider et piocher"):
 
-                        self.picking_mode = False;
-                        self.game.next_round();
+                            self.bttn_next_round.set_text("Passer au tour suivant");
+                            self.bttn_pick_new_letters.set_text("Piocher de nouvelles lettres");
 
-                    elif(button.get_text() == "Annuler"):
+                            self.picking_mode = False;
+                            self.game.next_round();
 
-                        self.bttn_next_round.set_text("Passer au tour suivant");
-                        self.bttn_pick_new_letters.set_text("Piocher de nouvelles lettres");
+                        elif(button.get_text() == "Annuler"):
 
-                        self.picking_mode = False;
-                        l_easel_case_to_renew = self.game.get_l_easel_case_to_renew();
-                        l_easel_case_to_renew.clear();
+                            self.bttn_next_round.set_text("Passer au tour suivant");
+                            self.bttn_pick_new_letters.set_text("Piocher de nouvelles lettres");
 
-                    elif(button.get_text() == "Passer au tour suivant"):
-                        self.game.next_round();
+                            self.picking_mode = False;
+                            l_easel_case_to_renew = self.game.get_l_easel_case_to_renew();
+                            l_easel_case_to_renew.clear();
+
+                        elif(button.get_text() == "Passer au tour suivant"):
+                            self.game.next_round();
+
+                    elif(self.page == Page.Save):
+
+                        if(button.get_text() == "Retour au jeu"):
+                            self.page = Page.Game;
+
+                        elif(button.get_text() == "Quitter sans sauvegarder"):
+
+                            menu_interface = self.interface.get_menu_interface();
+                            menu_interface.change_page(0);
+
+                            self.interface.change_page(0);
+
+                        elif(button.get_text() == "Sauvegarder la partie"):
+                            self.game.save_game();
+
+                            menu_interface = self.interface.get_menu_interface();
+                            menu_interface.change_page(0);
+
+                            self.interface.change_page(0);
 
 
                 #Gestion du click au niveau du chevalet
@@ -463,7 +566,7 @@ class GameInterface():
 
         elif(e.type == pygame.MOUSEMOTION):
 
-            for button in self.l_button_to_draw:
+            for button in self.l_button_to_draw_by_page[self.page]:
 
                 mouse_x = e.pos[0];
                 mouse_y = e.pos[1];
@@ -472,3 +575,6 @@ class GameInterface():
                     button.highlight(0, (23, 192, 187));
                 else:
                     button.remove_highlighting();
+
+    def change_page(self, page):
+        self.page = page;

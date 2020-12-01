@@ -9,13 +9,15 @@ class Button():
         self.font_name = font;
         self.pos = pos;
         self.text_size = text_size;
+        self.color = color;
+
         self.highlighted = False;
         self.underline = False;
         self.border = False;
         self.border_color = (255, 255, 255);
         self.padding = 0
         self.border_thickness = 1
-        self.color = color;
+        self.background_color = None;
 
     def draw(self, window):
 
@@ -32,12 +34,19 @@ class Button():
         text_image = font.render(self.text, True, color);
 
         size = self.get_size();
+
+        if(self.background_color != None):
+            border_rect = (self.pos[0]-size[0]/2, self.pos[1]-size[1]/2, size[0], size[1]);
+            window.fill(self.background_color, border_rect);
+
         draw_pos = (self.pos[0]-size[0]/2+self.padding, self.pos[1]-size[1]/2+self.padding);
         window.blit(text_image, draw_pos);
 
         if(self.border):
             border_rect = (self.pos[0]-size[0]/2, self.pos[1]-size[1]/2, size[0], size[1]);
             pygame.draw.rect(window, self.border_color, border_rect, self.border_thickness);
+
+
 
     def highlight(self, scale, color):
 
@@ -115,3 +124,6 @@ class Button():
 
     def set_border_thickness(self, thickness):
         self.border_thickness = thickness;
+
+    def set_background_color(self, background_color):
+        self.background_color = background_color;

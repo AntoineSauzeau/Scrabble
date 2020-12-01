@@ -4,6 +4,7 @@ import random
 import pdb
 from player import Player
 from word_checker import WordChecker
+from save_manager import SaveManager
 
 class GameStatus(IntEnum):
     NotStarted = 0,
@@ -43,6 +44,7 @@ class Game():
         self.first_letter = True;
         self.l_case_modified_during_round = [];
         self.word_checker = WordChecker(self);
+        self.save_manager = SaveManager(self);
 
         for player in l_player:
             player.set_game_instance(self);
@@ -302,7 +304,11 @@ class Game():
                 if(self.is_case_bonus(x, y)):
                     self.l_case_bonus_covered.append([x, y]);
 
+    def save_game(self):
+        self.save_manager.create_save();
 
+    def load_game(self):
+        pass;
 
 
     #GETTERS/SETTERS
@@ -348,12 +354,6 @@ class Game():
     def get_game_status(self):
         return self.game_status;
 
-    def set_player_turn(player):
-        self.player_turn = player;
-
-    def set_game_status(self, game_status):
-        self.game_status = game_status;
-
     def get_game_board(self):
         return self.game_board;
 
@@ -365,3 +365,27 @@ class Game():
 
     def get_l_easel_case_to_renew(self):
         return self.l_easel_case_to_renew;
+
+    def get_played_time(self):
+        return self.played_time;
+
+    def get_n_round(self):
+        return self.n_round;
+
+    def get_player_index(self):
+        return self.player_index;
+
+    def get_stack(self):
+        return self.stack;
+
+    def get_first_letter(self):
+        return self.first_letter;
+
+    def get_l_case_bonus_covered(self):
+        return self.l_case_bonus_covered;
+
+    def set_player_turn(self, player):
+        self.player_turn = player;
+
+    def set_game_status(self, game_status):
+        self.game_status = game_status;

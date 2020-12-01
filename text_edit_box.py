@@ -18,43 +18,27 @@ class TextEditBox:
         self.padding = 5;
         self.space_between_letter = 10;
 
-    def keyboard_event(self, e):
-        pass;
+    def keyboard_event(self, key):
+
+        if(key == None):
+            return;
+
+        if(65 <= key and key < 91):
+            letter = chr(key);
+            self.add_letter(letter);
+        elif(97 <= key and key < 123):
+            letter = chr(key);
+            self.add_letter(letter);
+        else:
+            if(key == 8):
+                self.remove_last_letter();
+
 
     def draw(self, window):
 
         font = pygame.font.SysFont(self.font_name, size=self.text_size);
 
-        l_img_letter = [];
-        max_img_letter_width = 0;
-        max_img_letter_height = 0;
-
-        #On crée l'image pour chaque lettre afin d'obtenir la taille de la lette la plus grosse
-        for i in range(len(self.text)):
-
-            letter = self.text[i];
-
-            img_letter = font.render(letter, True, self.color);
-            l_img_letter.append(img_letter);
-
-            img_letter_size = img_letter.get_size();
-            if(img_letter_size[0] > max_img_letter_width):
-                max_img_letter_width = img_letter_size[0];
-
-            if(img_letter_size[1] > max_img_letter_width):
-                max_img_letter_height = img_letter_size[1];
-
-            if(self.n_letter_max != -1 and i == self.n_letter_max-1):
-                break;
-
-        #Si on a pas de lettre, on en prend au hasard pour avoir la taille max de l'image des lettres
-        if(len(l_img_letter) == 0):
-            img_letter = font.render("K", True, self.color);
-            img_letter_size = img_letter.get_size();
-
-            max_img_letter_width = img_letter_size[0];
-            max_img_letter_height = img_letter_size[1];
-
+        max_img_letter_width, max_img_letter_height = self.get_max_letter_size();
 
         #On dessine les lignes qui montrent la position des lettres
         for x_i in range(self.n_letter):
@@ -73,9 +57,11 @@ class TextEditBox:
 
 
         #On dessine les lettres
-        for i in range(len(l_img_letter)):
+        for i in range(len(self.text)):
 
-            img_letter = l_img_letter[i];
+            letter = self.text[i];
+
+            img_letter = font.render(letter, True, self.color);
             img_letter_size = img_letter.get_size();
 
             img_x = self.pos[0]+self.padding+i*max_img_letter_width+max_img_letter_width/2-img_letter_size[0]/2+i*self.space_between_letter;
@@ -83,6 +69,9 @@ class TextEditBox:
 
             img_letter_rect = (img_x, img_y, max_img_letter_width, img_letter_size[1]);
             window.blit(img_letter, img_letter_rect);
+
+            if(self.n_letter_max != -1 and i == self.n_letter_max-1):
+                break;
 
 
         box_x = self.pos[0];
@@ -95,8 +84,48 @@ class TextEditBox:
         box.new_rectangle(window, self.b_color, box_rect, 1);
         box.draw();
 
+    def in_bounds(self, x, y):
+
+        size = self.get_size();
+
+        x_min = self.pos[0];
+        x_max = x_min + size[0];
+        y_min = self.pos[1];
+        y_max = y_min + size[1];
+
+        return (x_min <= x and x <= x_max and y_min <= y and y <= y_max);
+
+    def get_max_letter_size(self):
+
+        font = pygame.font.SysFont(self.font_name, size=self.text_size);
+
+        #On crée l'image pour chaque lettre afin d'obtenir la taille de la lettre la plus grosse
+
+        img_m = font.render("m", True, self.color);
+        img_j = font.render("j", True, self.color);
+
+        img_m_width = img_m.get_size()[0];
+        img_j_height = img_j.get_size()[1];
+
+        return (img_m_width, img_j_height);
+
+
     def get_size(self):
-        pass;
+
+        max_letter_size = self.get_max_letter_size();
+
+        height = 2*self.padding+max_letter_size[1]+7;
+        width = 2*self.padding+self.n_letter*max_letter_size[0]+(self.n_letter-1)*self.space_between_letter;
+
+        return (width, height);
+
+    def add_letter(self, letter):
+
+        if(len(self.text) < self.n_letter or (len(self.text) < self.n_letter_max and n_letter_max != -1)):
+            self.text += letter;
+
+    def remove_last_letter(self):
+        self.text = self.text[:len(self.text)-1]
 
 
     #GETTERS/SETTERS
@@ -106,7 +135,7 @@ class TextEditBox:
     def set_n_letter(self, n_letter):
         self.n_letter = n_letter;
 
-    def set_n_letter_max():
+    def set_n_letter_max(self):
         self.n_letter_max = n_letter_max;
 
     def set_text_size(self, text_size):
@@ -132,3 +161,36 @@ class TextEditBox:
 
     def set_space_between_letter(self, space_between_letter):
         self.space_between_letter = space_between_letter;
+
+    def get_focused(self):
+        return self.focused;
+
+    def get_n_letter(self):
+        return self.n_letter;
+
+    def get_n_letter_max(self):
+        return self.n_letter_max;
+
+    def get_text_size(self):
+        return self.text_size;
+
+    def get_text(self):
+        return self.text;
+
+    def get_color(self):
+        return self.color;
+
+    def get_b_color(self):
+        return self.b_color;
+
+    def get_padding(self):
+        return self.padding;
+
+    def get_font_name(self):
+        return self.font_name;
+
+    def get_pos(self):
+        return self.pos;
+
+    def get_space_between_letter(self):
+        return self.space_between_letter;

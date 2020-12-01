@@ -63,12 +63,18 @@ class Interface:
             self.window = pygame.display.set_mode((self.GAME_WINDOW_WIDTH, self.GAME_WINDOW_HEIGHT));
 
 
-    #getters/setters
+    #GETTERS/SETTERS
     def get_page():
         return self.page;
 
     def get_controller(self):
         return self.controller;
+
+    def get_menu_interface(self):
+        return self.menu;
+
+    def get_game_interface(self):
+        return self.game;
 
     def create_game_interface(self, game):
         self.game = GameInterface(self, game);

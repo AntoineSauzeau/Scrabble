@@ -10,6 +10,7 @@ from game import Game
 from player import Player
 from text_edit_box import TextEditBox
 from text_switch_widget import TextSwitchWidget
+from save_manager import SaveManager
 
 class Page(IntEnum):
     MainMenu = 0,
@@ -25,15 +26,19 @@ class MenuInterface():
         self.interface = interface;
         self.page = Page.MainMenu;
 
-        self.l_button_by_page = [[], []];
-        self.l_tew_by_page = [[], []];       #TextEditBox
-        self.l_tsw_by_page = [[], []];       #TextSwitchWidget
+        self.save_manager = SaveManager();
+
+        self.l_button_by_page = [[], [], []];
+        self.l_tew_by_page = [[], [], []];       #TextEditBox
+        self.l_tsw_by_page = [[], [], []];       #TextSwitchWidget
+
+        self.key_pressed = None;
 
         self.load_images();
 
         self.init_main_menu();
         self.init_game_menu();
-
+        self.init_save_menu();
 
 
     def init_main_menu(self):
@@ -41,13 +46,13 @@ class MenuInterface():
         interface_width = self.interface.MENU_WINDOW_WIDTH;
         interface_height = self.interface.MENU_WINDOW_HEIGHT;
 
-        bttn_play_mode_turn = Button("Jouer chacun son tour");
+        bttn_play_mode_turn = Button("Nouvelle partie");
         bttn_play_mode_turn.set_text_size(35);
         bttn_play_mode_turn.set_color((0, 0, 0));
         bttn_play_mode_turn.set_pos((interface_width/2, 275));
         bttn_play_mode_turn.set_padding(20);
 
-        bttn_play_mode_bot = Button("Jouer contre un bot");
+        bttn_play_mode_bot = Button("Reprendre une partie");
         bttn_play_mode_bot.set_text_size(35);
         bttn_play_mode_bot.set_color((0, 0, 0));
         bttn_play_mode_bot.set_pos((interface_width/2, 335));
@@ -85,30 +90,30 @@ class MenuInterface():
 
         page = 1;
 
-        tew_name_player_1 = TextEditBox();
-        tew_name_player_1.set_pos((15, 100));
+        self.tew_name_player_1 = TextEditBox();
+        self.tew_name_player_1.set_pos((15, 100));
 
-        tew_name_player_2 = TextEditBox();
-        tew_name_player_2.set_pos((15, 170));
+        self.tew_name_player_2 = TextEditBox();
+        self.tew_name_player_2.set_pos((15, 170));
 
-        tew_name_player_3 = TextEditBox();
-        tew_name_player_3.set_pos((15, 240));
+        self.tew_name_player_3 = TextEditBox();
+        self.tew_name_player_3.set_pos((15, 240));
 
-        tew_name_player_4 = TextEditBox();
-        tew_name_player_4.set_pos((15, 310));
+        self.tew_name_player_4 = TextEditBox();
+        self.tew_name_player_4.set_pos((15, 310));
 
-        self.l_tew_by_page[page].append(tew_name_player_1);
-        self.l_tew_by_page[page].append(tew_name_player_2);
-        self.l_tew_by_page[page].append(tew_name_player_3);
-        self.l_tew_by_page[page].append(tew_name_player_4);
+        self.l_tew_by_page[page].append(self.tew_name_player_1);
+        self.l_tew_by_page[page].append(self.tew_name_player_2);
+        self.l_tew_by_page[page].append(self.tew_name_player_3);
+        self.l_tew_by_page[page].append(self.tew_name_player_4);
 
 
-        tsw_n_bot = TextSwitchWidget();
-        tsw_n_bot.set_pos(interface_width/2, 447);
-        tsw_n_bot.set_l_value(["0", "1", "2", "3"]);
-        tsw_n_bot.set_text_size(16);
+        self.tsw_n_bot = TextSwitchWidget();
+        self.tsw_n_bot.set_pos(interface_width/2, 447);
+        self.tsw_n_bot.set_l_value(["0", "1", "2", "3"]);
+        self.tsw_n_bot.set_text_size(16);
 
-        self.l_tsw_by_page[page].append(tsw_n_bot);
+        self.l_tsw_by_page[page].append(self.tsw_n_bot);
 
 
         bttn_start_game = Button("Lancer la partie");
@@ -120,6 +125,36 @@ class MenuInterface():
 
         self.l_button_by_page[page].append(bttn_start_game);
 
+    def init_save_menu(self):
+
+        interface_width = self.interface.MENU_WINDOW_WIDTH;
+        interface_height = self.interface.MENU_WINDOW_HEIGHT;
+
+        bttn_load = Button("Charger");
+        bttn_load.set_text_size(24);
+        bttn_load.set_padding(10);
+        bttn_load.set_pos((interface_width-55, interface_height-30));
+        bttn_load.set_border(True);
+        bttn_load.set_border_thickness(3);
+
+        bttn_back = Button("Retour");
+        bttn_back.set_text_size(24);
+        bttn_back.set_padding(10);
+        bttn_back.set_pos((50, interface_height-30));
+        bttn_back.set_border(True);
+        bttn_back.set_border_thickness(3);
+
+        page = Page.SaveMenu;
+        self.l_button_by_page[page].append(bttn_load);
+        self.l_button_by_page[page].append(bttn_back);
+
+        tsw_page = TextSwitchWidget();
+        tsw_page.set_pos(interface_width/2, 485);
+        tsw_page.set_l_value(["Page 1", "Page 2"]);
+        tsw_page.set_text_size(16);
+
+        self.l_tsw_by_page[page].append(tsw_page);
+
 
     #Fonctions draw
     def draw(self, window):
@@ -130,6 +165,10 @@ class MenuInterface():
             self.draw_main_menu(window);
         elif(self.page == Page.GameMenu):
             self.draw_game_menu(window);
+        elif(self.page == Page.SaveMenu):
+            self.draw_save_menu(window);
+
+        self.draw_widgets(window);
 
         pygame.display.flip();
 
@@ -143,9 +182,6 @@ class MenuInterface():
 
         window.blit(self.img_scrabble_title, (0, 0));
 
-        i_page=int(Page.MainMenu)
-        for button in self.l_button_by_page[i_page]:
-            button.draw(window);
 
     def draw_game_menu(self, window):
 
@@ -154,7 +190,7 @@ class MenuInterface():
 
         #PART BACKGROUND
         background_rect = (0, 0, interface_width, interface_height);
-        pygame.draw.rect(window, (46, 40, 42), background_rect);
+        pygame.draw.rect(window, (101, 13, 27), background_rect);
 
 
         #PART PLAYER NAME
@@ -213,15 +249,53 @@ class MenuInterface():
         pygame.draw.line(window, (255, 255, 255), line_2_start_pos, line_2_end_pos);
 
 
+    def draw_save_menu(self, window):
 
-        i_page=int(Page.GameMenu)
-        for button in self.l_button_by_page[i_page]:
+        interface_width = self.interface.MENU_WINDOW_WIDTH;
+        interface_height = self.interface.MENU_WINDOW_HEIGHT;
+
+        #PART BACKGROUND
+        background_rect = (0, 0, interface_width, interface_height);
+        pygame.draw.rect(window, (101, 13, 27), background_rect);
+
+        font = pygame.font.SysFont("", size=32);
+        img_text_l_save = font.render("Liste des sauvegardes", True, (255, 255, 255));
+
+        img_text_l_save_size = img_text_l_save.get_size();
+        img_text_l_save_x = interface_width/2 - img_text_l_save_size[0]/2;
+
+        window.blit(img_text_l_save, (img_text_l_save_x, 40));
+
+        save_list_box_width = int(interface_width/1.5);
+        save_list_box_x = interface_width/2 - (save_list_box_width)/2;
+
+        save_list_box_rect = (save_list_box_x, 105, save_list_box_width, 350);
+
+        pygame.draw.rect(window, (255, 255, 255), save_list_box_rect);
+        pygame.draw.rect(window, (0, 0, 0), save_list_box_rect, 4);
+
+        l_save_name = self.save_manager.get_l_save_name();
+        n_save = len(l_save_name);
+
+        font = pygame.font.SysFont("", size=23);
+
+        text_n_save = "Vous avez " + str(n_save) + " sauvegarde(s)";
+        img_text_n_save = font.render(text_n_save, True, (0, 0, 0));
+
+        img_text_n_save_width = img_text_n_save.get_size()[0];
+        img_text_n_save_x = interface_width/2-img_text_n_save_width/2;
+
+        window.blit(img_text_n_save, (img_text_n_save_x, 125));
+
+    def draw_widgets(self, window):
+
+        for button in self.l_button_by_page[self.page]:
             button.draw(window);
 
-        for tew in self.l_tew_by_page[i_page]:
+        for tew in self.l_tew_by_page[self.page]:
             tew.draw(window);
 
-        for tsw in self.l_tsw_by_page[i_page]:
+        for tsw in self.l_tsw_by_page[self.page]:
             tsw.draw(window);
 
 
@@ -261,14 +335,31 @@ class MenuInterface():
                     if(button.get_text() == "Quitter"):
                         controller = self.interface.get_controller();
                         controller.quit();
-                    elif(button.get_text() == "Jouer chacun son tour"):
+                    elif(button.get_text() == "Nouvelle partie"):
+                        self.change_page(Page.GameMenu);
 
-                        game = Game([Player("Antoine"), Player("Alexandre")]);
-                        self.interface.create_game_interface(game);
-                        self.interface.change_page(1);
+                    elif(button.get_text() == "Reprendre une partie"):
+                        self.change_page(Page.SaveMenu);
 
-                    elif(button.get_text() == "Jouer contre un bot"):
-                        self.change_page(1);
+                    elif(button.get_text() == "Lancer la partie"):
+
+                        l_player = [];
+
+                        for tew in self.l_tew_by_page[Page.GameMenu]:
+
+                            player_name = tew.get_text();
+                            if(player_name != ""):
+                                l_player.append(Player(player_name));
+
+
+                        if(len(l_player) >= 2):
+                            game = Game(l_player);
+                            self.interface.create_game_interface(game);
+                            self.interface.change_page(1);
+
+                    elif(button.get_text() == "Retour"):
+                        self.change_page(Page.MainMenu);
+
 
             for tsw in self.l_tsw_by_page[i_page]:
 
@@ -276,6 +367,26 @@ class MenuInterface():
                     tsw.previous();
                 elif(tsw.in_arrow_right_bounds(mouse_x, mouse_y)):
                     tsw.next();
+
+            for tew in self.l_tew_by_page[i_page]:
+
+                if(tew.in_bounds(mouse_x, mouse_y)):
+                    tew.set_focused(True);
+                else:
+                    tew.set_focused(False);
+
+        elif(e.type == pygame.KEYDOWN):
+            self.key_pressed = e.key;
+
+        elif(e.type == pygame.KEYUP):
+
+            for tew in self.l_tew_by_page[i_page]:
+
+                if(tew.get_focused()):
+
+                    tew.keyboard_event(self.key_pressed);
+                    self.key_pressed = None;
+
 
 
     def change_page(self, page):
