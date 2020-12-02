@@ -10,7 +10,20 @@ class SaveManager:
         self.save_file_path = "save.json";
 
     def load_save(self, save_name):
-        pass;
+
+        file_save = open(self.save_file_path, "r");
+        data_string = file_save.read();
+
+        file_save.close();
+
+        data_all_save = json.loads(data_string);
+        data_save = data_all_save[save_name];
+
+        self.game.set_played_time(data_save["played_time"]);
+        self.game.set_n_round(data_save["n_round"]);
+        self.game.set_player_index(data_save["player_index"]);
+        self.game.set_game_status(data_save["game_status"]);
+        self.game.set_game_board(data_save["game_board"]);
 
     def create_save(self):
 
@@ -32,12 +45,30 @@ class SaveManager:
         data_save["game_board"] = game.get_game_board();
 
         save_name = str(date.now());
+        save_name = save_name[:19];
+
         data_all_save[save_name] = data_save;
 
         file_save = open(self.save_file_path, "w");
         json.dump(data_all_save, file_save);
 
         file_save.close();
+
+    def remove_save(self, save_name):
+
+        file_save = open(self.save_file_path, "r");
+        data_string = file_save.read();
+
+        file_save.close();
+
+        data_all_save = json.loads(data_string);
+        data_all_save.pop(save_name);
+
+        file_save = open(self.save_file_path, "w");
+        json.dump(data_all_save, file_save);
+
+        file_save.close();
+
 
     def get_l_save_name(self):
 

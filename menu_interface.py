@@ -5,6 +5,8 @@ import pygame
 import time
 from enum import IntEnum
 import os
+import math
+
 from button import Button
 from game import Game
 from player import Player
@@ -33,6 +35,12 @@ class MenuInterface():
         self.l_tsw_by_page = [[], [], []];       #TextSwitchWidget
 
         self.key_pressed = None;
+
+        self.n_save_per_page = 10;
+        self.save_page_index = 0;
+        self.index_save_selected = None;
+        self.l_img_delete_save_rect = [];
+        self.l_img_text_save_rect = [];
 
         self.load_images();
 
@@ -148,12 +156,12 @@ class MenuInterface():
         self.l_button_by_page[page].append(bttn_load);
         self.l_button_by_page[page].append(bttn_back);
 
-        tsw_page = TextSwitchWidget();
-        tsw_page.set_pos(interface_width/2, 485);
-        tsw_page.set_l_value(["Page 1", "Page 2"]);
-        tsw_page.set_text_size(16);
+        self.tsw_page = TextSwitchWidget();
+        self.tsw_page.set_pos(interface_width/2, 485);
+        self.tsw_page.set_l_value(["Page 1", "Page 2"]);
+        self.tsw_page.set_text_size(16);
 
-        self.l_tsw_by_page[page].append(tsw_page);
+        self.l_tsw_by_page[page].append(self.tsw_page);
 
 
     #Fonctions draw
@@ -269,7 +277,7 @@ class MenuInterface():
         save_list_box_width = int(interface_width/1.5);
         save_list_box_x = interface_width/2 - (save_list_box_width)/2;
 
-        save_list_box_rect = (save_list_box_x, 105, save_list_box_width, 350);
+        save_list_box_rect = (save_list_box_x, 95, save_list_box_width, 350);
 
         pygame.draw.rect(window, (255, 255, 255), save_list_box_rect);
         pygame.draw.rect(window, (0, 0, 0), save_list_box_rect, 4);
@@ -285,7 +293,55 @@ class MenuInterface():
         img_text_n_save_width = img_text_n_save.get_size()[0];
         img_text_n_save_x = interface_width/2-img_text_n_save_width/2;
 
-        window.blit(img_text_n_save, (img_text_n_save_x, 125));
+        window.blit(img_text_n_save, (img_text_n_save_x, 115));
+
+        font = pygame.font.SysFont("", size=24);
+
+        self.l_img_delete_save_rect.clear();
+        self.l_img_text_save_rect.clear();
+
+        save_min_index = self.save_page_index*self.n_save_per_page;
+        save_max_index = save_min_index + self.n_save_per_page;
+        for save_index in range(save_min_index, save_max_index):
+
+            if(save_index == len(l_save_name)):
+                break;
+
+            save_name = l_save_name[save_index];
+            text_save = str(save_index+1) + ") " + save_name;
+
+            img_text_save = font.render(text_save, True, (0, 0, 0));
+
+            img_text_save_size = img_text_save.get_size();
+            img_text_save_y = (save_index-save_min_index)*28+156-img_text_save_size[1]/2;
+
+            window.blit(img_text_save, (85, img_text_save_y));
+
+            img_text_save_rect = (85, img_text_save_y, img_text_save_size[0], img_text_save_size[1]);
+
+            self.l_img_text_save_rect.append(img_text_save_rect);
+
+
+            img_delete_save_size = self.img_red_cross.get_size();
+            img_delete_save_x = save_list_box_x+save_list_box_width-27-img_delete_save_size[0]/2;
+            img_delete_save_y = img_text_save_y-img_delete_save_size[1]/2+img_text_save_size[1]/2;
+
+            window.blit(self.img_red_cross, (img_delete_save_x, img_delete_save_y));
+
+            img_delete_save_rect = (img_delete_save_x, img_delete_save_y, img_delete_save_size[0], img_delete_save_size[1]);
+
+            self.l_img_delete_save_rect.append(img_delete_save_rect);
+
+
+        n_save_page = math.ceil(len(l_save_name)/self.n_save_per_page);
+        l_page_name = [];
+        for i in range(n_save_page):
+            page_name = "Page " + str(i+1);
+            l_page_name.append(page_name);
+
+        self.tsw_page.set_l_value(l_page_name);
+
+
 
     def draw_widgets(self, window):
 
@@ -303,6 +359,9 @@ class MenuInterface():
 
         #On charge les images une seule fois pour éviter de perdre du temps à chaque fois
         self.img_scrabble_title = pygame.image.load(os.path.join("Images", "Scrabble_title.png"));
+
+        self.img_red_cross = pygame.image.load(os.path.join("Images", "red_cross.png"))
+        self.img_red_cross = pygame.transform.scale(self.img_red_cross, (15, 15));
 
 
 
@@ -368,12 +427,46 @@ class MenuInterface():
                 elif(tsw.in_arrow_right_bounds(mouse_x, mouse_y)):
                     tsw.next();
 
+            self.save_page_index = self.tsw_page.get_index();
+
             for tew in self.l_tew_by_page[i_page]:
 
                 if(tew.in_bounds(mouse_x, mouse_y)):
                     tew.set_focused(True);
                 else:
                     tew.set_focused(False);
+
+            for i in range(len(self.l_img_delete_save_rect)):
+
+                img_delete_save_rect = self.l_img_delete_save_rect[i];
+
+                if(self.in_rect_bounds(img_delete_save_rect, mouse_x, mouse_y)):
+
+                    save_min_index = self.save_page_index*self.n_save_per_page;
+
+                    l_save_name = self.save_manager.get_l_save_name();
+                    save_name = l_save_name[save_min_index+i];
+
+                    self.save_manager.remove_save(save_name);
+
+            for i in range(len(self.l_img_text_save_rect)):
+
+                img_text_save_rect = self.l_img_text_save_rect[i];
+
+                if(self.in_rect_bounds(img_text_save_rect, mouse_x, mouse_y)):
+
+                    save_min_index = self.save_page_index*self.n_save_per_page;
+
+                    l_save_name = self.save_manager.get_l_save_name();
+                    if(i == len(l_save_name)):
+                        break;
+
+                    save_name = l_save_name[save_min_index+i]; print(save_name);
+
+                    self.save_manager.load_save(save_name);
+                    self.interface.change_page(1);
+
+
 
         elif(e.type == pygame.KEYDOWN):
             self.key_pressed = e.key;
@@ -387,6 +480,15 @@ class MenuInterface():
                     tew.keyboard_event(self.key_pressed);
                     self.key_pressed = None;
 
+
+    def in_rect_bounds(self, rect, x, y):
+
+        x_min = rect[0];
+        y_min = rect[1];
+        x_max = x_min + rect[2];
+        y_max = y_min + rect[3];
+
+        return (x >= x_min and x <= x_max and y >= y_min and y <= y_max);
 
 
     def change_page(self, page):

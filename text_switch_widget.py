@@ -64,6 +64,9 @@ class TextSwitchWidget:
 
     def in_arrow_left_bounds(self, x, y):
 
+        if(self.index >= len(self.l_value)):
+            return False;
+
         text = self.l_value[self.index];
 
         font = pygame.font.SysFont(self.font_name, size=self.text_size);
@@ -83,6 +86,9 @@ class TextSwitchWidget:
         return (x_min <= x and x <= x_max and y_min <= y and y <= y_max);
 
     def in_arrow_right_bounds(self, x, y):
+
+        if(self.index >= len(self.l_value)):
+            return False;
 
         text = self.l_value[self.index];
 
@@ -122,3 +128,6 @@ class TextSwitchWidget:
 
     def set_text_color(self, text_color):
         self.text_color = text_color;
+
+    def get_index(self):
+        return self.index;

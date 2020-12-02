@@ -384,8 +384,35 @@ class Game():
     def get_l_case_bonus_covered(self):
         return self.l_case_bonus_covered;
 
-    def set_player_turn(self, player):
-        self.player_turn = player;
-
     def set_game_status(self, game_status):
         self.game_status = game_status;
+
+    def set_game_board(self, game_board):
+        self.game_board = game_board;
+
+    def set_l_case_modified_during_round(self, l_case_modified_during_round):
+        self.l_case_modified_during_round = l_case_modified_during_round;
+
+    def set_l_letter_information(self, l_letter_information):
+        self.l_letter_information = l_letter_information;
+
+    def set_l_easel_case_to_renew(self, l_easel_case_to_renew):
+        self.l_easel_case_to_renew = l_easel_case_to_renew;
+
+    def set_played_time(self, played_time):
+        self.played_time = played_time;
+
+    def set_n_round(self, n_round):
+        self.n_round = n_round;
+
+    def set_player_index(self, player_index):
+        self.player_index = player_index;
+
+    def set_stack(self, stack):
+        self.stack = stack;
+
+    def set_first_letter(self, first_letter):
+        self.first_letter = first_letter;
+
+    def set_l_case_bonus_covered(self, l_case_bonus_covered):
+        self.l_case_bonus_covered;
