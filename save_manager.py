@@ -1,6 +1,8 @@
 import json
 from datetime import datetime
 
+from player import Player
+
 class SaveManager:
 
     def __init__(self, game=None):
@@ -25,6 +27,23 @@ class SaveManager:
         self.game.set_game_status(data_save["game_status"]);
         self.game.set_game_board(data_save["game_board"]);
 
+        l_player = [];
+        data_l_player = data_save["l_player"];
+        for data_player in data_l_player:
+
+            player = Player();
+            player.set_name(data_player["name"]);
+            player.set_score(data_player["score"]);
+
+            easel = player.get_easel();
+            easel_data = data_player["easel"];
+
+            easel.set_l_letter(easel_data["l_letter"]);
+
+            l_player.append(player);
+
+        self.game.set_l_player(l_player);
+
     def create_save(self):
 
         date = datetime.today();
@@ -43,6 +62,22 @@ class SaveManager:
         data_save["player_index"] = game.get_player_index();
         data_save["game_status"] = game.get_game_status();
         data_save["game_board"] = game.get_game_board();
+
+        data_save["l_player"] = [];
+        for player in game.get_l_player():
+
+            player_data = {};
+
+            player_data["name"] = player.get_name();
+            player_data["score"] = player.get_score();
+
+            easel = player.get_easel();
+            easel_data = {};
+            easel_data["l_letter"] = easel.get_l_letter();
+
+            player_data["easel"] = easel_data;
+
+            data_save["l_player"].append(player_data);
 
         save_name = str(date.now());
         save_name = save_name[:19];

@@ -1,9 +1,12 @@
-from button import Button
+from enum import IntEnum
 import pygame
 import os
+
 from game import GameStatus
 from shape import Shape
-from enum import IntEnum
+from button import Button
+from message import Message, Alignment
+
 
 class Page(IntEnum):
     Game = 0,
@@ -21,6 +24,7 @@ class GameInterface():
         self.l_button_to_draw_by_page = [[], []];
         self.l_easel_case_rectangle = [];
         self.l_img_letter = [];
+        self.l_message = [];
 
         self.picking_mode = False;           #Variable à True quand l'utilisateur est en train de choisir des lettres à dégager pour en piocher d'autres
         self.letter_moving_mode = False;
@@ -84,6 +88,10 @@ class GameInterface():
         self.l_button_to_draw_by_page[page].append(self.bttn_pause);
         self.l_button_to_draw_by_page[page].append(bttn_display_help);
         self.l_button_to_draw_by_page[page].append(bttn_return_to_menu);
+
+        self.message_placed_word = Message();
+
+        self.l_message.append(self.message_placed_word);
 
     def init_save_page(self):
 
@@ -368,6 +376,9 @@ class GameInterface():
             image_size = img_txt_player_turn.get_size();
             window.blit(img_txt_player_turn, (970-image_size[0]/2, 600));
 
+        for message in self.l_message:
+            message.draw(window);
+
 
         #Pour le debug
         '''for x in range(0, 15):
@@ -415,6 +426,33 @@ class GameInterface():
             self.game.set_game_status(GameStatus.InProgress);
             self.game.loop_timer();
             self.bttn_pause.set_text("Mettre en pause");
+
+    def show_message_placed_word(self, word, value, player_name):
+
+        interface_width = self.interface.GAME_WINDOW_WIDTH;
+        interface_height = self.interface.GAME_WINDOW_HEIGHT;
+
+        if(value != 0):
+            title_text = "Le joueur " + player_name + " a posé le mot " + word;
+            subtitle_text = "Il remporte " + str(value) + " points";
+        else:
+            title_text = "Le joueur " + player_name + " a posé le mot " + word;
+            subtitle_text = "Ce mot n'est pas valable, il remporte aucun point";
+
+        self.message_placed_word.set_text_title(title_text);
+        self.message_placed_word.set_text_subtitle(subtitle_text);
+        self.message_placed_word.set_horizontal_alignment(Alignment.Center);
+        self.message_placed_word.set_text_title_size(40);
+        self.message_placed_word.set_text_subtitle_size(32);
+        self.message_placed_word.set_space_between_titles(20);
+        self.message_placed_word.set_color_title((0, 0, 0));
+        self.message_placed_word.set_color_subtitle((0, 0, 0));
+        self.message_placed_word.set_border_color((0, 0, 0));
+        self.message_placed_word.set_border_thickness(4);
+
+        self.message_placed_word.set_pos((interface_width/2, 200));
+
+        self.message_placed_word.show(3);
 
 
     def event(self, e):

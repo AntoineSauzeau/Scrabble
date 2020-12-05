@@ -1,7 +1,7 @@
 
 class Player:
 
-    def __init__(self, name):
+    def __init__(self, name=""):
 
         self.name = name;
         self.score = 0
@@ -23,6 +23,12 @@ class Player:
 
     def set_score(self, score):
         self.score = score;
+
+    def set_name(self, name):
+        self.name = name;
+
+    def set_easel(self, easel):
+        self.easel = easel;
 
     def set_game_instance(self, game):
         self.game = game;
@@ -65,6 +71,9 @@ class Easel:
 
     def get_l_letter(self):
         return self.l_letter;
+
+    def set_l_letter(self, l_letter):
+        self.l_letter = l_letter;
 
     def set_game_instance(self, game):
         self.game = game;

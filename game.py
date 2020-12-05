@@ -2,9 +2,11 @@ from enum import IntEnum
 import threading
 import random
 import pdb
+
 from player import Player
 from word_checker import WordChecker
 from save_manager import SaveManager
+from message import Message
 
 class GameStatus(IntEnum):
     NotStarted = 0,
@@ -20,7 +22,7 @@ class CaseType(IntEnum):
 
 class Game():
 
-    def __init__(self, l_player):
+    def __init__(self, l_player=[]):
 
         self.l_player = l_player
 
@@ -143,10 +145,14 @@ class Game():
 
         self.n_round += 1;
         player = self.l_player[self.player_index];
+        player_name = player.get_name();
 
         if(len(self.l_case_modified_during_round) != 0):
 
             print(self.word_checker.is_valid_word());
+
+            word_placed_with_coord = self.word_checker.get_word_placed();
+            word_placed = self.word_checker.word_with_coord_to_string(word_placed_with_coord);
 
             if(self.word_checker.is_valid_word()):
                 total_value_placed = self.word_checker.count_total_placed_value();
@@ -154,8 +160,13 @@ class Game():
 
                 player.add_score(total_value_placed);
 
+                self.game_interface.show_message_placed_word(word_placed, total_value_placed, player_name);
+
             else:
                 self.remove_letter_on_game_board(self.l_case_modified_during_round);
+
+                self.game_interface.show_message_placed_word(word_placed, 0, player_name);
+
 
         for case_index in self.l_easel_case_to_renew:
             easel = player.get_easel();
@@ -416,3 +427,9 @@ class Game():
 
     def set_l_case_bonus_covered(self, l_case_bonus_covered):
         self.l_case_bonus_covered;
+
+    def set_l_player(self, l_player):
+        self.l_player = l_player;
+
+    def set_game_interface_instance(self, game_interface):
+        self.game_interface = game_interface;

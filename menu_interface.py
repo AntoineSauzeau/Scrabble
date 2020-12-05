@@ -414,6 +414,10 @@ class MenuInterface():
                         if(len(l_player) >= 2):
                             game = Game(l_player);
                             self.interface.create_game_interface(game);
+                            
+                            game_interface = self.interface.get_game_interface();
+                            game.set_game_interface_instance(game_interface);
+
                             self.interface.change_page(1);
 
                     elif(button.get_text() == "Retour"):
@@ -463,7 +467,11 @@ class MenuInterface():
 
                     save_name = l_save_name[save_min_index+i]; print(save_name);
 
+                    self.game = Game();
+                    self.save_manager.set_game_instance(self.game);
                     self.save_manager.load_save(save_name);
+
+                    self.interface.create_game_interface(self.game);
                     self.interface.change_page(1);
 
 
