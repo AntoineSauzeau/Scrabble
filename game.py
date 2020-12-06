@@ -38,15 +38,22 @@ class Game():
         self.n_round = 1;
         self.player_index = 0;            #Stocke l'utilisateur qui joue
         self.game_status = GameStatus.NotStarted;
+        self.last_round = False;
 
         self.game_board = [];       #Liste à 2 dimensions représentant le placement des lettres sur le plateau de jeu
         self.stack = [];
         self.l_letter_information = {};
 
+        self.picking_mode = False;
+
+        self.l_joker_pos = [];
+
         self.first_letter = True;
         self.l_case_modified_during_round = [];
         self.word_checker = WordChecker(self);
         self.save_manager = SaveManager(self);
+
+        self.game_interface = None;
 
         for player in l_player:
             player.set_game_instance(self);
@@ -147,6 +154,11 @@ class Game():
         player = self.l_player[self.player_index];
         player_name = player.get_name();
 
+        if(self.picking_mode):
+            self.remove_letter_on_game_board(self.l_case_modified_during_round);
+            self.l_case_modified_during_round.clear();
+            self.picking_mode = False;
+
         if(len(self.l_case_modified_during_round) != 0):
 
             print(self.word_checker.is_valid_word());
@@ -161,6 +173,8 @@ class Game():
                 player.add_score(total_value_placed);
 
                 self.game_interface.show_message_placed_word(word_placed, total_value_placed, player_name);
+                if(len(self.l_case_modified_during_round) == 7):
+                    self.game_interface.show_message_scrabble(player_name);
 
             else:
                 self.remove_letter_on_game_board(self.l_case_modified_during_round);
@@ -177,6 +191,9 @@ class Game():
         self.l_case_modified_during_round.clear();
         easel = player.get_easel();
         easel.fill();
+
+        if(self.last_round == True):
+            self.end_game();
 
         if(self.player_index+1 == len(self.l_player)):
             self.player_index = 0;
@@ -212,7 +229,7 @@ class Game():
         self.l_letter_information["X"] = {"occ": 1, "val": 10}
         self.l_letter_information["Y"] = {"occ": 1, "val": 10}
         self.l_letter_information["Z"] = {"occ": 1, "val": 10}
-        self.l_letter_information["?"] = {"occ": 2, "val": 0}
+        self.l_letter_information["?"] = {"occ": 40, "val": 0}
 
     def init_stack(self):
 
@@ -234,12 +251,11 @@ class Game():
 
     def pick_a_letter(self):
 
+        if(len(self.stack) == 0):
+            self.last_round = True;
+
         letter = self.stack[0];     #La pioche est déjà mélangée dans il suffit de prendre de prendre le 1er index pour avoir une lettre "aléatoire"
         self.stack.pop(0);
-
-        #En attendant d'implémenter les jokers
-        if(letter == "?"):
-            letter = "A";
 
         return letter;
 
@@ -289,9 +305,10 @@ class Game():
                 if(i == len(self.l_case_modified_during_round)-1):
                     return False;
 
-        #On vérifie qu'il y ait bien une lettre sur une des 4 cases autour
-        if(not(self.has_letter_around(case_x, case_y)) and self.first_letter != True):
-            return False;
+        if(case_x != 7 or case_y != 7):
+            #On vérifie qu'il y ait bien une lettre sur une des 4 cases autour
+            if(not(self.has_letter_around(case_x, case_y))):
+                return False;
 
         return True;
 
@@ -318,8 +335,11 @@ class Game():
     def save_game(self):
         self.save_manager.create_save();
 
-    def load_game(self):
-        pass;
+    def end_game(self):
+
+        self.game_status = GameStatus.Finished;
+        self.game_interface
+
 
 
     #GETTERS/SETTERS
@@ -395,6 +415,12 @@ class Game():
     def get_l_case_bonus_covered(self):
         return self.l_case_bonus_covered;
 
+    def get_picking_mode(self):
+        return self.picking_mode;
+
+    def get_l_joker_pos(self):
+        return self.l_joker_pos;
+
     def set_game_status(self, game_status):
         self.game_status = game_status;
 
@@ -433,3 +459,6 @@ class Game():
 
     def set_game_interface_instance(self, game_interface):
         self.game_interface = game_interface;
+
+    def set_picking_mode(self, picking_mode):
+        self.picking_mode = picking_mode;

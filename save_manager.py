@@ -118,6 +118,8 @@ class SaveManager:
             save_name = save[0];
             l_save_name.append(save_name);
 
+        l_save_name.reverse();
+
         return l_save_name;
 
     def set_game_instance(self, game):

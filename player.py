@@ -45,7 +45,10 @@ class Easel:
     def renew_letter(self, easel_index):
 
             picked_letter = self.game.pick_a_letter();
-            picked_letter_index = ord(picked_letter)-65;
+            if(picked_letter != "?"):
+                picked_letter_index = ord(picked_letter)-65;
+            else:
+                picked_letter_index = 26;
 
             self.l_letter[easel_index] = picked_letter_index;
             print(picked_letter_index);
@@ -68,6 +71,21 @@ class Easel:
         for i in range(7):
             if(self.l_letter[i] == -1):
                 self.renew_letter(i);
+
+    def count_total_value(self):
+
+        l_letter_information = self.game.get_l_letter_information();
+        easel_value = 0;
+
+        for i in range(7):
+            letter_index = self.easel[i];
+            letter = chr(letter_index+65);
+
+            letter_value = l_letter_information[letter]["val"];
+            easel_value += letter_value;
+
+        return easel_value;
+
 
     def get_l_letter(self):
         return self.l_letter;

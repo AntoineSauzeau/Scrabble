@@ -26,9 +26,11 @@ class GameInterface():
         self.l_img_letter = [];
         self.l_message = [];
 
-        self.picking_mode = False;           #Variable à True quand l'utilisateur est en train de choisir des lettres à dégager pour en piocher d'autres
         self.letter_moving_mode = False;
         self.letter_moving_index = -1;
+
+        self.joker_choice_mode = False;
+        self.l_joker_letter_choice_rect = [];
 
         self.interface = interface;
         self.game = game;
@@ -90,8 +92,10 @@ class GameInterface():
         self.l_button_to_draw_by_page[page].append(bttn_return_to_menu);
 
         self.message_placed_word = Message();
+        self.message_scrabble = Message();
 
         self.l_message.append(self.message_placed_word);
+        self.l_message.append(self.message_scrabble);
 
     def init_save_page(self):
 
@@ -151,6 +155,10 @@ class GameInterface():
 
             self.l_img_letter.append(img_letter);
 
+        img_joker_path = os.path.join("Images", "Letters", "joker.png");
+        img_joker = pygame.image.load(img_joker_path);
+
+        self.l_img_letter.append(img_joker);
 
         self.img_loop = pygame.image.load(os.path.join("Images", "loop.png"));
         self.img_background_save = pygame.image.load(os.path.join("Images", "background_save.png"));
@@ -245,6 +253,8 @@ class GameInterface():
                     #On réduit légèrement la taille des lettres pour qu'elles rentrent dans les cases sans effacer les contours
                     letter_case_rect = (x+1, y+1, letter_case_size-2, letter_case_size-2);
                     window.blit(img_letter, letter_case_rect);
+
+
 
             #Si il y a des lettres qui ont été désigné pour être échangé alors on marque ces lettres avec un signe
             l_easel_case_to_renew = self.game.get_l_easel_case_to_renew();
@@ -363,6 +373,65 @@ class GameInterface():
             window.blit(img_letter_moving, (img_letter_moving_x, img_letter_moving_y));
 
 
+        #DRAW JOKER CHOICE
+
+        if(self.joker_choice_mode):
+
+            space_between_letter = 18;
+            img_letter_size = 35
+
+            background_width = img_letter_size*10+space_between_letter*8+60;
+            background_x = interface_width/2-background_width/2;
+
+            pygame.draw.rect(window, (255, 255, 255), (background_x, 160, background_width, 300));
+            pygame.draw.rect(window, (0, 0, 0), (background_x, 160, background_width, 300), 3);
+
+            font = pygame.font.SysFont("", size=40);
+            img_text_choice_joker = font.render("*** Choix du joker ***", True, (0, 0, 0));
+
+            img_text_choice_joker_size = img_text_choice_joker.get_size();
+            img_text_choice_joker_x = interface_width/2-img_text_choice_joker_size[0]/2;
+
+            window.blit(img_text_choice_joker, (img_text_choice_joker_x, 200));
+
+            self.l_joker_letter_choice_rect.clear();
+
+            y_min = 250;
+            for y_i in range(3):
+
+                if(y_i < 2):
+                    line_width = img_letter_size*10+space_between_letter*9;
+                else:
+                    line_width = img_letter_size*7+space_between_letter*6;
+
+                img_letter_y = y_min + y_i*60;
+                x_min = interface_width/2-line_width/2;
+                for x_i in range(10):
+
+                    img_index = y_i*10+x_i;
+                    if(img_index == 26):
+                        break;
+
+
+                    img_letter = self.l_img_letter[img_index];
+                    img_letter = pygame.transform.scale(img_letter, (img_letter_size, img_letter_size));
+
+                    img_letter_x = x_min+x_i*(space_between_letter+img_letter_size);
+                    if(y_i == 2):
+                        img_letter_x += img_letter_size;
+
+                    letter_frame_rect = (img_letter_x-2, img_letter_y-2, img_letter_size+4, img_letter_size+4);
+
+                    letter_frame_srect = Shape();
+                    letter_frame_srect.new_rectangle(window, (0, 0, 0), letter_frame_rect, 2);
+
+                    letter_frame_srect.draw();
+
+                    self.l_joker_letter_choice_rect.append(letter_frame_srect);
+
+                    window.blit(img_letter, (img_letter_x, img_letter_y));
+
+
 
         #DRAW PART PLAYER TURN
 
@@ -434,7 +503,7 @@ class GameInterface():
 
         if(value != 0):
             title_text = "Le joueur " + player_name + " a posé le mot " + word;
-            subtitle_text = "Il remporte " + str(value) + " points";
+            subtitle_text = "Il remporte " + str(value) + " points !";
         else:
             title_text = "Le joueur " + player_name + " a posé le mot " + word;
             subtitle_text = "Ce mot n'est pas valable, il remporte aucun point";
@@ -453,6 +522,29 @@ class GameInterface():
         self.message_placed_word.set_pos((interface_width/2, 200));
 
         self.message_placed_word.show(3);
+
+    def show_message_scrabble(self, player_name):
+
+        interface_width = self.interface.GAME_WINDOW_WIDTH;
+        interface_height = self.interface.GAME_WINDOW_HEIGHT;
+
+        title_text = "Le joueur " + player_name + " a fait un scrabble !!!";
+        subtitle_text = "Il remporte 50 points bonus !";
+
+        self.message_scrabble.set_text_title(title_text);
+        self.message_scrabble.set_text_subtitle(subtitle_text);
+        self.message_scrabble.set_horizontal_alignment(Alignment.Center);
+        self.message_scrabble.set_text_title_size(40);
+        self.message_scrabble.set_text_subtitle_size(32);
+        self.message_scrabble.set_space_between_titles(20);
+        self.message_scrabble.set_color_title((0, 0, 0));
+        self.message_scrabble.set_color_subtitle((0, 0, 0));
+        self.message_scrabble.set_border_color((0, 0, 0));
+        self.message_scrabble.set_border_thickness(4);
+
+        self.message_scrabble.set_pos((interface_width/2, 200));
+
+        self.message_placed_word.add_queued_message(self.message_scrabble, 3);
 
 
     def event(self, e):
@@ -490,14 +582,13 @@ class GameInterface():
                             self.bttn_next_round.set_text("Valider et piocher");
                             self.bttn_pick_new_letters.set_text("Annuler");
 
-                            self.picking_mode = True;
+                            self.game.set_picking_mode(True);
 
                         elif(button.get_text() == "Valider et piocher"):
 
                             self.bttn_next_round.set_text("Passer au tour suivant");
                             self.bttn_pick_new_letters.set_text("Piocher de nouvelles lettres");
 
-                            self.picking_mode = False;
                             self.game.next_round();
 
                         elif(button.get_text() == "Annuler"):
@@ -505,7 +596,8 @@ class GameInterface():
                             self.bttn_next_round.set_text("Passer au tour suivant");
                             self.bttn_pick_new_letters.set_text("Piocher de nouvelles lettres");
 
-                            self.picking_mode = False;
+                            self.game.set_picking_mode(False);
+
                             l_easel_case_to_renew = self.game.get_l_easel_case_to_renew();
                             l_easel_case_to_renew.clear();
 
@@ -540,7 +632,7 @@ class GameInterface():
 
                     if(easel_case_rectangle.in_bounds(mouse_x, mouse_y)):
 
-                        if(self.picking_mode):
+                        if(self.game.get_picking_mode()):
 
                             l_easel_case_to_renew = self.game.get_l_easel_case_to_renew();
 
@@ -598,8 +690,28 @@ class GameInterface():
 
                                 letter_placed = self.game.add_letter_to_game_board(x_i, y_i, self.letter_moving_index);
                                 if(letter_placed):
+
+                                    if(self.letter_moving_index == 26):
+                                        self.joker_choice_mode = True;
+
+                                        l_joker_pos = self.game.get_l_joker_pos();
+                                        l_joker_pos.append((x_i, y_i));
+
                                     self.letter_moving_mode = False;
                                     self.letter_moving_index = -1;
+
+                for letter_index in range(len(self.l_joker_letter_choice_rect)):
+                    letter_choice_rect = self.l_joker_letter_choice_rect[letter_index];
+
+                    if(letter_choice_rect.in_bounds(mouse_x, mouse_y)):
+
+                        self.joker_choice_mode = False;
+
+                        game_board = self.game.get_game_board();
+                        l_joker_pos = self.game.get_l_joker_pos();
+
+                        last_joker_pos = l_joker_pos[-1];
+                        game_board[last_joker_pos[0]][last_joker_pos[1]] = letter_index;
 
 
         elif(e.type == pygame.MOUSEMOTION):

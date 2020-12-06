@@ -10,7 +10,7 @@ import math
 from button import Button
 from game import Game
 from player import Player
-from text_edit_box import TextEditBox
+from text_edit_widget import TextEditWidget
 from text_switch_widget import TextSwitchWidget
 from save_manager import SaveManager
 
@@ -31,7 +31,7 @@ class MenuInterface():
         self.save_manager = SaveManager();
 
         self.l_button_by_page = [[], [], []];
-        self.l_tew_by_page = [[], [], []];       #TextEditBox
+        self.l_tew_by_page = [[], [], []];       #TextEditWidget
         self.l_tsw_by_page = [[], [], []];       #TextSwitchWidget
 
         self.key_pressed = None;
@@ -98,16 +98,16 @@ class MenuInterface():
 
         page = 1;
 
-        self.tew_name_player_1 = TextEditBox();
+        self.tew_name_player_1 = TextEditWidget();
         self.tew_name_player_1.set_pos((15, 100));
 
-        self.tew_name_player_2 = TextEditBox();
+        self.tew_name_player_2 = TextEditWidget();
         self.tew_name_player_2.set_pos((15, 170));
 
-        self.tew_name_player_3 = TextEditBox();
+        self.tew_name_player_3 = TextEditWidget();
         self.tew_name_player_3.set_pos((15, 240));
 
-        self.tew_name_player_4 = TextEditBox();
+        self.tew_name_player_4 = TextEditWidget();
         self.tew_name_player_4.set_pos((15, 310));
 
         self.l_tew_by_page[page].append(self.tew_name_player_1);
@@ -414,7 +414,7 @@ class MenuInterface():
                         if(len(l_player) >= 2):
                             game = Game(l_player);
                             self.interface.create_game_interface(game);
-                            
+
                             game_interface = self.interface.get_game_interface();
                             game.set_game_interface_instance(game_interface);
 
@@ -422,6 +422,7 @@ class MenuInterface():
 
                     elif(button.get_text() == "Retour"):
                         self.change_page(Page.MainMenu);
+                        self.l_img_text_save_rect.clear();
 
 
             for tsw in self.l_tsw_by_page[i_page]:
@@ -465,7 +466,7 @@ class MenuInterface():
                     if(i == len(l_save_name)):
                         break;
 
-                    save_name = l_save_name[save_min_index+i]; print(save_name);
+                    save_name = l_save_name[save_min_index+i];
 
                     self.game = Game();
                     self.save_manager.set_game_instance(self.game);
@@ -473,6 +474,9 @@ class MenuInterface():
 
                     self.interface.create_game_interface(self.game);
                     self.interface.change_page(1);
+
+                    self.l_img_text_save_rect.clear()
+                    break;
 
 
 

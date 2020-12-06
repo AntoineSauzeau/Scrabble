@@ -2,7 +2,7 @@ import pygame
 from shape import Shape
 import time
 
-class TextEditBox:
+class TextEditWidget:
     def __init__(self, text="", n_letter=10, pos=(15,15)):
 
         self.text = text;

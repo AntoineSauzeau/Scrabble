@@ -7,7 +7,7 @@ import threading
 
 class Controller():
 
-    FPS = 120
+    FPS = 160
 
     def __init__(self):
 

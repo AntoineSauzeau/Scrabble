@@ -272,11 +272,15 @@ class WordChecker:
     def count_word_value(self, word):
 
         l_letter_information = self.game.get_l_letter_information();
+        l_joker_pos = self.game.get_l_joker_pos();
 
         word_value = 0;
         for letter in word:
             letter_x = letter[0];
             letter_y = letter[1];
+
+            if(letter_x == l_joker_pos[0] and letter_y == l_joker_pos[1]):
+                break;
 
             letter_index = letter[2];
             letter_string = chr(65+letter_index);

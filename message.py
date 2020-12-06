@@ -29,6 +29,8 @@ class Message:
         self.border_color = (255, 255, 255);
         self.background_color = (255, 255, 255);
         self.border_thickness = -1;
+        self.queued_message = None;
+        self.queued_message_time = 0;
 
 
     def draw(self, window):
@@ -92,6 +94,10 @@ class Message:
     def hide(self):
         self.visible = False;
 
+        if(self.queued_message != None):
+            self.queued_message.show(self.queued_message_time);
+            self.queued_message = None;
+
 
     def get_size(self):
 
@@ -114,6 +120,10 @@ class Message:
         max_width += self.padding*2;
 
         return (max_width, height);
+
+    def add_queued_message(self, message, time):
+        self.queued_message = message;
+        self.queued_message_time = time;
 
 
 
