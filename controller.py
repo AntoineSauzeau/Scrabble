@@ -38,5 +38,12 @@ class Controller():
         self.interface = Interface(self);
 
     def quit(self):
+
+        game_interface = self.interface.get_game_interface();
+        if(game_interface != None):
+            game_instance = game_interface.get_game_instance();
+            game_instance.stop_timer();
+
+
         print("Fin du programme.")
         self.exit = True;

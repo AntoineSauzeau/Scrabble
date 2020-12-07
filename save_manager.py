@@ -26,6 +26,7 @@ class SaveManager:
         self.game.set_player_index(data_save["player_index"]);
         self.game.set_game_status(data_save["game_status"]);
         self.game.set_game_board(data_save["game_board"]);
+        self.game.set_l_joker_pos(data_save["l_joker_pos"]);
 
         l_player = [];
         data_l_player = data_save["l_player"];
@@ -62,6 +63,7 @@ class SaveManager:
         data_save["player_index"] = game.get_player_index();
         data_save["game_status"] = game.get_game_status();
         data_save["game_board"] = game.get_game_board();
+        data_save["l_joker_pos"] = game.get_l_joker_pos();
 
         data_save["l_player"] = [];
         for player in game.get_l_player():

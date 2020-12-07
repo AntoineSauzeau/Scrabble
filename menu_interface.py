@@ -17,7 +17,8 @@ from save_manager import SaveManager
 class Page(IntEnum):
     MainMenu = 0,
     GameMenu = 1,
-    SaveMenu = 2
+    SaveMenu = 2,
+    StatsMenu = 3
 
 class MenuInterface():
 
@@ -30,9 +31,9 @@ class MenuInterface():
 
         self.save_manager = SaveManager();
 
-        self.l_button_by_page = [[], [], []];
-        self.l_tew_by_page = [[], [], []];       #TextEditWidget
-        self.l_tsw_by_page = [[], [], []];       #TextSwitchWidget
+        self.l_button_by_page = [[], [], [], []];
+        self.l_tew_by_page = [[], [], [], []];       #TextEditWidget
+        self.l_tsw_by_page = [[], [], [], []];       #TextSwitchWidget
 
         self.key_pressed = None;
 
@@ -47,6 +48,7 @@ class MenuInterface():
         self.init_main_menu();
         self.init_game_menu();
         self.init_save_menu();
+        self.init_stats_menu();
 
 
     def init_main_menu(self):
@@ -124,14 +126,22 @@ class MenuInterface():
         self.l_tsw_by_page[page].append(self.tsw_n_bot);
 
 
-        bttn_start_game = Button("Lancer la partie");
-        bttn_start_game.set_text_size(27);
-        bttn_start_game.set_pos((interface_width-105, interface_height-35));
-        bttn_start_game.set_border(True);
-        bttn_start_game.set_padding(8);
-        bttn_start_game.set_border_thickness(3);
+        bttn_next = Button("Suivant");
+        bttn_next.set_text_size(27);
+        bttn_next.set_pos((interface_width-56, interface_height-30));
+        bttn_next.set_border(True);
+        bttn_next.set_padding(8);
+        bttn_next.set_border_thickness(3);
 
-        self.l_button_by_page[page].append(bttn_start_game);
+        bttn_back = Button("Retour");
+        bttn_back.set_text_size(27);
+        bttn_back.set_pos((51, interface_height-30));
+        bttn_back.set_border(True);
+        bttn_back.set_padding(8);
+        bttn_back.set_border_thickness(3);
+
+        self.l_button_by_page[page].append(bttn_next);
+        self.l_button_by_page[page].append(bttn_back);
 
     def init_save_menu(self):
 
@@ -163,6 +173,12 @@ class MenuInterface():
 
         self.l_tsw_by_page[page].append(self.tsw_page);
 
+    def init_stats_menu(self):
+
+        interface_width = self.interface.MENU_WINDOW_WIDTH;
+        interface_height = self.interface.MENU_WINDOW_HEIGHT;
+
+        '''....'''
 
     #Fonctions draw
     def draw(self, window):
@@ -400,7 +416,7 @@ class MenuInterface():
                     elif(button.get_text() == "Reprendre une partie"):
                         self.change_page(Page.SaveMenu);
 
-                    elif(button.get_text() == "Lancer la partie"):
+                    elif(button.get_text() == "Suivant"):
 
                         l_player = [];
 

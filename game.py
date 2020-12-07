@@ -89,8 +89,12 @@ class Game():
         if(self.game_status == GameStatus.Paused or self.game_status == GameStatus.Finished):
             return;
 
-        timer = threading.Timer(1, self.loop_timer);
-        timer.start();
+        self.timer = threading.Timer(1, self.loop_timer);
+        self.timer.daemon = True;
+        self.timer.start();
+
+    def stop_timer(self):
+        self.timer.cancel();
 
     def add_letter_to_game_board(self, case_x, case_y, letter_index):
 
@@ -229,7 +233,7 @@ class Game():
         self.l_letter_information["X"] = {"occ": 1, "val": 10}
         self.l_letter_information["Y"] = {"occ": 1, "val": 10}
         self.l_letter_information["Z"] = {"occ": 1, "val": 10}
-        self.l_letter_information["?"] = {"occ": 40, "val": 0}
+        self.l_letter_information["?"] = {"occ": 2, "val": 0}
 
     def init_stack(self):
 
@@ -462,3 +466,6 @@ class Game():
 
     def set_picking_mode(self, picking_mode):
         self.picking_mode = picking_mode;
+
+    def set_l_joker_pos(self, l_joker_pos):
+        self.l_joker_pos = l_joker_pos;

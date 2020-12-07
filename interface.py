@@ -1,4 +1,6 @@
 import pygame
+import pyautogui
+from pygame._sdl2.video import Window
 from menu_interface import MenuInterface
 from game_interface import GameInterface
 from enum import IntEnum
@@ -52,15 +54,25 @@ class Interface:
 
     def change_page(self, page):
 
+        screen_width, screen_height = pyautogui.size();
+
         if(page == Page.Menu):
 
-            self.page = page
+            window_pos = (screen_width/2-self.MENU_WINDOW_WIDTH/2, screen_height/2-self.MENU_WINDOW_HEIGHT/2);
+
+            self.page = page;
             self.window = pygame.display.set_mode((self.MENU_WINDOW_WIDTH, self.MENU_WINDOW_HEIGHT));
 
         elif(page == Page.Game):
 
-            self.page = page
+            window_pos = (screen_width/2-self.GAME_WINDOW_WIDTH/2, screen_height/2-self.GAME_WINDOW_HEIGHT/2);
+
+            self.page = page;
             self.window = pygame.display.set_mode((self.GAME_WINDOW_WIDTH, self.GAME_WINDOW_HEIGHT));
+
+
+        #window = Window.from_display_module();
+        #window.position = window_pos;
 
 
     #GETTERS/SETTERS

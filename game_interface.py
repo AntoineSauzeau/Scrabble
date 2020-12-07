@@ -219,7 +219,7 @@ class GameInterface():
 
         font = pygame.font.SysFont("", size=20);
         for i in range(7):
-            x = interface_width/2-easel_width/2+i*letter_case_size;
+            x = interface_width/2-easel_width/2+(i*letter_case_size)+(i/1.88)*2;
             y = 585
 
             letter_case_rect = (x, y, letter_case_size, letter_case_size);
@@ -728,3 +728,6 @@ class GameInterface():
 
     def change_page(self, page):
         self.page = page;
+
+    def get_game_instance(self):
+        return self.game;
