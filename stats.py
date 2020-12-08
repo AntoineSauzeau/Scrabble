@@ -79,6 +79,9 @@ class Stats:
 
         file_stats.close();
 
+    def get_l_player(self):
+        pass;
+
     def reset_all(self):
         pass;
 

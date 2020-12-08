@@ -32,6 +32,8 @@ class GameInterface():
         self.joker_choice_mode = False;
         self.l_joker_letter_choice_rect = [];
 
+        self.exit_after_save_window = False;
+
         self.interface = interface;
         self.game = game;
 
@@ -55,7 +57,12 @@ class GameInterface():
         self.bttn_pick_new_letters.set_underline(True);
 
         self.bttn_next_round = Button();
-        self.bttn_next_round.set_text("Commencer la partie");
+
+        if(self.game.get_game_taken_up()):
+            self.bttn_next_round.set_text("Reprendre la partie");
+        else:
+            self.bttn_next_round.set_text("Commencer la partie");
+
         self.bttn_next_round.set_text_size(25);
         self.bttn_next_round.set_color((255, 255, 255));
         self.bttn_next_round.set_pos((970, 650));
@@ -93,9 +100,11 @@ class GameInterface():
 
         self.message_placed_word = Message();
         self.message_scrabble = Message();
+        self.message_pick_stack = Message();
 
         self.l_message.append(self.message_placed_word);
         self.l_message.append(self.message_scrabble);
+        self.l_message.append(self.message_pick_stack);
 
     def init_save_page(self):
 
@@ -546,13 +555,60 @@ class GameInterface():
 
         self.message_placed_word.add_queued_message(self.message_scrabble, 3);
 
+    def show_message_pick_stack(self, player_name, l_letter_picked, n_letter_remained):
+
+        interface_width = self.interface.GAME_WINDOW_WIDTH;
+        interface_height = self.interface.GAME_WINDOW_HEIGHT;
+
+        title_text = "Le joueur " + player_name + " a pioché les lettres " + "".join(l_letter_picked); print(title_text)
+        subtitle_text = "Il reste " + str(n_letter_remained)+ " lettres dans la pioche";
+
+        self.message_pick_stack.set_text_title(title_text);
+        self.message_pick_stack.set_text_subtitle(subtitle_text);
+        self.message_pick_stack.set_horizontal_alignment(Alignment.Center);
+        self.message_pick_stack.set_text_title_size(40);
+        self.message_pick_stack.set_text_subtitle_size(32);
+        self.message_pick_stack.set_space_between_titles(20);
+        self.message_pick_stack.set_color_title((0, 0, 0));
+        self.message_pick_stack.set_color_subtitle((0, 0, 0));
+        self.message_pick_stack.set_border_color((0, 0, 0));
+        self.message_pick_stack.set_border_thickness(4);
+
+        self.message_pick_stack.set_pos((interface_width/2, 200));
+
+        self.message_pick_stack.show(3);
+
+    def show_message_save_loaded(self):
+
+        interface_width = self.interface.GAME_WINDOW_WIDTH;
+        interface_height = self.interface.GAME_WINDOW_HEIGHT;
+
+        title_text = "Partie chargée avec succès !"
+
+        self.message_pick_stack.set_text_title(title_text);
+        self.message_pick_stack.set_horizontal_alignment(Alignment.Center);
+        self.message_pick_stack.set_text_title_size(40);
+        self.message_pick_stack.set_color_title((0, 0, 0));
+        self.message_pick_stack.set_border_color((0, 0, 0));
+        self.message_pick_stack.set_border_thickness(4);
+        self.message_pick_stack.set_padding(14);
+
+        self.message_pick_stack.set_pos((interface_width/2, 200));
+
+        self.message_pick_stack.show(3);
+
 
     def event(self, e):
 
         interface_width = self.interface.GAME_WINDOW_WIDTH;
         interface_height = self.interface.GAME_WINDOW_HEIGHT;
 
-        if(e.type == pygame.MOUSEBUTTONUP):
+        if(e.type == pygame.QUIT):
+            self.page = Page.Save;
+            self.exit_after_save_window = True;
+
+
+        elif(e.type == pygame.MOUSEBUTTONUP):
 
             for button in self.l_button_to_draw_by_page[self.page]:
 
@@ -564,7 +620,7 @@ class GameInterface():
 
                     if(self.page == Page.Game):
 
-                        if(button.get_text() == "Commencer la partie"):
+                        if(button.get_text() == "Commencer la partie" or button.get_text() == "Reprendre la partie"):
                             self.game.start_game();
                             self.bttn_next_round.set_text("Passer au tour suivant");
 
@@ -579,10 +635,13 @@ class GameInterface():
 
                         elif(button.get_text() == "Piocher de nouvelles lettres"):
 
-                            self.bttn_next_round.set_text("Valider et piocher");
-                            self.bttn_pick_new_letters.set_text("Annuler");
+                            game_status = self.game.get_game_status();
+                            if(game_status == GameStatus.InProgress):
 
-                            self.game.set_picking_mode(True);
+                                self.bttn_next_round.set_text("Valider et piocher");
+                                self.bttn_pick_new_letters.set_text("Annuler");
+
+                                self.game.set_picking_mode(True);
 
                         elif(button.get_text() == "Valider et piocher"):
 
@@ -608,13 +667,12 @@ class GameInterface():
 
                         if(button.get_text() == "Retour au jeu"):
                             self.page = Page.Game;
+                            self.exit_after_save_window = False;
 
                         elif(button.get_text() == "Quitter sans sauvegarder"):
 
                             menu_interface = self.interface.get_menu_interface();
                             menu_interface.change_page(0);
-
-                            self.interface.change_page(0);
 
                         elif(button.get_text() == "Sauvegarder la partie"):
                             self.game.save_game();
@@ -622,6 +680,14 @@ class GameInterface():
                             menu_interface = self.interface.get_menu_interface();
                             menu_interface.change_page(0);
 
+
+
+                    if(button.get_text() == "Sauvegarder la partie" or button.get_text() == "Quitter sans sauvegarder"):
+
+                        if(self.exit_after_save_window):
+                            controller = self.interface.get_controller();
+                            controller.quit();
+                        else:
                             self.interface.change_page(0);
 
 

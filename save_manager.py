@@ -24,7 +24,6 @@ class SaveManager:
         self.game.set_played_time(data_save["played_time"]);
         self.game.set_n_round(data_save["n_round"]);
         self.game.set_player_index(data_save["player_index"]);
-        self.game.set_game_status(data_save["game_status"]);
         self.game.set_game_board(data_save["game_board"]);
         self.game.set_l_joker_pos(data_save["l_joker_pos"]);
 
@@ -45,6 +44,8 @@ class SaveManager:
 
         self.game.set_l_player(l_player);
 
+        self.game.set_game_taken_up(True);
+
     def create_save(self):
 
         date = datetime.today();
@@ -61,7 +62,6 @@ class SaveManager:
         data_save["played_time"] = game.get_played_time();
         data_save["n_round"] = game.get_n_round();
         data_save["player_index"] = game.get_player_index();
-        data_save["game_status"] = game.get_game_status();
         data_save["game_board"] = game.get_game_board();
         data_save["l_joker_pos"] = game.get_l_joker_pos();
 

@@ -51,7 +51,7 @@ class Easel:
                 picked_letter_index = 26;
 
             self.l_letter[easel_index] = picked_letter_index;
-            print(picked_letter_index);
+            return picked_letter_index;
 
     def get_first_free_place(self):
 

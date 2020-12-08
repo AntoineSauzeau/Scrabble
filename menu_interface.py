@@ -13,6 +13,7 @@ from player import Player
 from text_edit_widget import TextEditWidget
 from text_switch_widget import TextSwitchWidget
 from save_manager import SaveManager
+from stats import Stats
 
 class Page(IntEnum):
     MainMenu = 0,
@@ -44,6 +45,7 @@ class MenuInterface():
         self.l_img_text_save_rect = [];
 
         self.load_images();
+        self.stats = Stats();
 
         self.init_main_menu();
         self.init_game_menu();
@@ -178,7 +180,12 @@ class MenuInterface():
         interface_width = self.interface.MENU_WINDOW_WIDTH;
         interface_height = self.interface.MENU_WINDOW_HEIGHT;
 
-        '''....'''
+        self.tsw_player_stats = TextSwitchWidget();
+        self.tsw_player_stats.set_pos(interface_width/2, 500);
+
+        #self.stats.load();
+
+
 
     #Fonctions draw
     def draw(self, window):
@@ -386,7 +393,11 @@ class MenuInterface():
 
         i_page = int(self.page);
 
-        if(e.type == pygame.MOUSEMOTION):
+        if(e.type == pygame.QUIT):
+            controller = self.interface.get_controller();
+            controller.quit();
+
+        elif(e.type == pygame.MOUSEMOTION):
 
             for button in self.l_button_by_page[i_page]:
 
@@ -415,6 +426,10 @@ class MenuInterface():
 
                     elif(button.get_text() == "Reprendre une partie"):
                         self.change_page(Page.SaveMenu);
+
+                    elif(button.get_text() == "Statistiques"):
+                        #self.change_page(Page.StatsMenu);
+                        pass;
 
                     elif(button.get_text() == "Suivant"):
 
@@ -490,6 +505,10 @@ class MenuInterface():
 
                     self.interface.create_game_interface(self.game);
                     self.interface.change_page(1);
+
+                    game_interface = self.interface.get_game_interface();
+                    self.game.set_game_interface_instance(game_interface);
+                    game_interface.show_message_save_loaded();
 
                     self.l_img_text_save_rect.clear()
                     break;

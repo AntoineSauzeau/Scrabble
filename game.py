@@ -39,6 +39,7 @@ class Game():
         self.player_index = 0;            #Stocke l'utilisateur qui joue
         self.game_status = GameStatus.NotStarted;
         self.last_round = False;
+        self.game_taken_up = False;
 
         self.game_board = [];       #Liste à 2 dimensions représentant le placement des lettres sur le plateau de jeu
         self.stack = [];
@@ -80,6 +81,9 @@ class Game():
         for player in self.l_player:
             easel = player.get_easel();
             easel.fill();
+
+        if(self.game_board[7][7] != -1):
+            self.first_letter = False;
 
         self.loop_timer();
 
@@ -186,9 +190,21 @@ class Game():
                 self.game_interface.show_message_placed_word(word_placed, 0, player_name);
 
 
+        l_letter_picked = [];
         for case_index in self.l_easel_case_to_renew:
             easel = player.get_easel();
-            easel.renew_letter(case_index);
+
+            letter_index = easel.renew_letter(case_index);
+            if(letter_index != 26):
+                letter = chr(65+letter_index);
+            else:
+                letter = "?";
+
+            l_letter_picked.append(letter);
+
+        if(len(self.l_easel_case_to_renew) != 0):
+            print(player_name, l_letter_picked, len(self.stack));
+            self.game_interface.show_message_pick_stack(player_name, l_letter_picked, len(self.stack));
 
         self.l_easel_case_to_renew.clear();
 
@@ -342,7 +358,7 @@ class Game():
     def end_game(self):
 
         self.game_status = GameStatus.Finished;
-        self.game_interface
+        #self.game_interface
 
 
 
@@ -425,6 +441,9 @@ class Game():
     def get_l_joker_pos(self):
         return self.l_joker_pos;
 
+    def get_game_taken_up(self):
+        return self.game_taken_up;
+
     def set_game_status(self, game_status):
         self.game_status = game_status;
 
@@ -469,3 +488,6 @@ class Game():
 
     def set_l_joker_pos(self, l_joker_pos):
         self.l_joker_pos = l_joker_pos;
+
+    def set_game_taken_up(self, game_taken_up):
+        self.game_taken_up = game_taken_up;

@@ -275,12 +275,15 @@ class WordChecker:
         l_joker_pos = self.game.get_l_joker_pos();
 
         word_value = 0;
+        word_double = False;
+        word_triple = False;
         for letter in word:
             letter_x = letter[0];
             letter_y = letter[1];
 
-            if(letter_x == l_joker_pos[0] and letter_y == l_joker_pos[1]):
-                break;
+            if(len(l_joker_pos)):
+                if(letter_x == l_joker_pos[0] and letter_y == l_joker_pos[1]):
+                    break;
 
             letter_index = letter[2];
             letter_string = chr(65+letter_index);
@@ -288,8 +291,7 @@ class WordChecker:
 
             case_type = self.game.get_case_type(letter_x, letter_y);
 
-            word_double = False;
-            word_triple = False;
+
             if(case_type == game.CaseType.LD):
                 letter_value = letter_value*2;
             elif(case_type == game.CaseType.LT):

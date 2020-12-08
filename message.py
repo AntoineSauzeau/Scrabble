@@ -54,6 +54,7 @@ class Message:
         img_text_title_y = self.pos[1]+self.padding;
         img_text_subtitle_y = self.pos[1]+img_text_title_size[1]+self.space_between_titles+self.padding;
 
+
         if(self.horizontal_alignment == Alignment.Left):
             img_text_title_x = self.pos[0]+self.padding;
             img_text_subtitle_x = self.pos[0]+self.padding;
@@ -116,7 +117,10 @@ class Message:
         else:
             max_width = img_text_title_size[0];
 
-        height = img_text_title_size[1]+self.space_between_titles+img_text_subtitle_size[1]+self.padding*2;
+        height = img_text_title_size[1]+self.padding*2;
+        if(self.text_subtitle != ""):
+            height += self.space_between_titles+img_text_subtitle_size[1];
+
         max_width += self.padding*2;
 
         return (max_width, height);
