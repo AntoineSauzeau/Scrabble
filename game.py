@@ -1,7 +1,6 @@
 from enum import IntEnum
 import threading
 import random
-import pdb
 
 from player import Player
 from word_checker import WordChecker
@@ -69,6 +68,7 @@ class Game():
             self.game_board.append(x_list);
 
         self.init_l_letter_information();
+
         self.init_stack();
 
 
@@ -158,6 +158,9 @@ class Game():
 
     def next_round(self):
 
+        if(self.game_status == GameStatus.Finished):
+            return;
+
         self.n_round += 1;
         player = self.l_player[self.player_index];
         player_name = player.get_name();
@@ -195,6 +198,9 @@ class Game():
             easel = player.get_easel();
 
             letter_index = easel.renew_letter(case_index);
+            if(letter_index == None):
+                continue;
+
             if(letter_index != 26):
                 letter = chr(65+letter_index);
             else:
@@ -203,8 +209,9 @@ class Game():
             l_letter_picked.append(letter);
 
         if(len(self.l_easel_case_to_renew) != 0):
-            print(player_name, l_letter_picked, len(self.stack));
-            self.game_interface.show_message_pick_stack(player_name, l_letter_picked, len(self.stack));
+            if(len(l_letter_picked) != 0):
+                print(player_name, l_letter_picked, len(self.stack));
+                self.game_interface.show_message_pick_stack(player_name, l_letter_picked, len(self.stack));
 
         self.l_easel_case_to_renew.clear();
 
@@ -212,8 +219,15 @@ class Game():
         easel = player.get_easel();
         easel.fill();
 
-        if(self.last_round == True):
-            self.end_game();
+        if(len(self.stack) == 0):
+
+            for player in self.l_player:
+
+                player_easel = player.get_easel();
+                if(player_easel.empty()):
+                    self.end_game();
+
+
 
         if(self.player_index+1 == len(self.l_player)):
             self.player_index = 0;
@@ -272,7 +286,7 @@ class Game():
     def pick_a_letter(self):
 
         if(len(self.stack) == 0):
-            self.last_round = True;
+            return None;
 
         letter = self.stack[0];     #La pioche est déjà mélangée dans il suffit de prendre de prendre le 1er index pour avoir une lettre "aléatoire"
         self.stack.pop(0);
@@ -358,7 +372,56 @@ class Game():
     def end_game(self):
 
         self.game_status = GameStatus.Finished;
-        #self.game_interface
+
+
+        finisher_player = None;
+        for player in self.l_player:
+
+            easel = player.get_easel();
+            if(easel.empty()):
+                finisher_player = player;
+
+        finisher_bonus = 0;
+        for player in self.l_player:
+
+            easel = player.get_easel();
+
+            if(finisher_player != player):
+
+                easel_value = easel.count_total_value();
+                player_score = player.get_score();
+
+                penalty = easel_value;
+                if((player_score - penalty) < 0):
+                    player_score = 0;
+                else:
+                    player_score -= penalty;
+
+                player.set_score(player_score);
+                finisher_bonus += easel_value;
+
+        finisher_player.add_score(finisher_bonus);
+
+        winner = None;
+        first_player_score = -1;
+        second_player_score = -1;
+        for player in self.l_player:
+
+            player_score = player.get_score();
+
+            if(player_score >= first_player_score):
+                second_player_score = first_player_score;
+                first_player_score = player_score;
+
+                winner = player;
+
+        #Egalité
+        if(first_player_score == second_player_score):
+            winner = None;
+
+        winner_name = winner.get_name();
+        self.game_interface.show_message_end_game(winner_name, first_player_score);
+
 
 
 

@@ -30,8 +30,8 @@ class Stats:
         self.n_letter_placed = data_stats["n_placed_letter"];
         self.n_placed_word = data_stats["n_placed_word"];
 
-        l_player_stats = data_stats["l_player_stats"];
-        for (player_name, player_stats) in l_player_stats.items():
+        self.l_player_stats = data_stats["l_player_stats"];
+        '''for (player_name, player_stats) in l_player_stats.items():
 
             l_player_stats[player_name]["n_win"] = player_stats["n_win"];
             l_player_stats[player_name]["n_lose"] = player_stats["n_lose"];
@@ -39,13 +39,8 @@ class Stats:
             l_player_stats[player_name]["time_played"] = player_stats["time_played"];
             l_player_stats[player_name]["n_placed_letter"] = player_stats["n_placed_letter"];
             l_player_stats[player_name]["n_placed_word"] = player_stats["n_placed_word"];
-            l_player_stats[player_name]["score_earned"] = player_stats["score_earned"];
+            l_player_stats[player_name]["score_earned"] = player_stats["score_earned"];'''
 
-
-        file_stats = open(self.stats_file_path, "r");
-        json.dump(data_stats, file_stats);
-
-        file_stats.close();
 
 
     def save(self):
@@ -62,8 +57,8 @@ class Stats:
         data_stats["n_placed_word"] = self.n_placed_word;
         data_stats["n_placed_letter"] = self.n_placed_letter;
 
-        l_player_stats = data_stats["l_player_stats"];
-        for (player_name, player_stats) in l_player_stats.items():
+        data_stats["l_player_stats"] = self.l_player_stats;
+        '''for (player_name, player_stats) in l_player_stats.items():
 
             player_stats["n_win"] = l_player_stats[player_name]["n_win"];
             player_stats["n_lose"] = l_player_stats[player_name]["n_lose"];
@@ -71,16 +66,18 @@ class Stats:
             player_stats["time_played"] = l_player_stats[player_name]["time_played"];
             player_stats["n_placed_letter"] = l_player_stats[player_name]["n_placed_letter"];
             player_stats["n_placed_word"] = l_player_stats[player_name]["n_placed_word"];
-            player_stats["score_earned"] = l_player_stats[player_name]["score_earned"];
+            player_stats["score_earned"] = l_player_stats[player_name]["score_earned"];'''
 
 
-        file_stats = open(self.stats_file_path, "r");
+        file_stats = open(self.stats_file_path, "w");
         json.dump(data_stats, file_stats);
 
         file_stats.close();
 
-    def get_l_player(self):
-        pass;
+    def get_l_player_name(self):
+
+        return self.l_player_stats.keys();
+
 
     def reset_all(self):
         pass;

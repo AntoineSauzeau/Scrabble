@@ -183,7 +183,15 @@ class MenuInterface():
         self.tsw_player_stats = TextSwitchWidget();
         self.tsw_player_stats.set_pos(interface_width/2, 500);
 
-        #self.stats.load();
+        bttn_back = Button("Retour");
+        bttn_back.set_text_size(24);
+        bttn_back.set_padding(10);
+        bttn_back.set_pos((50, interface_height-30));
+        bttn_back.set_border(True);
+        bttn_back.set_border_thickness(3);
+
+        page = Page.StatsMenu;
+        self.l_button_by_page[page].append(bttn_back);
 
 
 
@@ -198,6 +206,8 @@ class MenuInterface():
             self.draw_game_menu(window);
         elif(self.page == Page.SaveMenu):
             self.draw_save_menu(window);
+        elif(self.page == Page.StatsMenu):
+            self.draw_stats_menu(window);
 
         self.draw_widgets(window);
 
@@ -365,6 +375,29 @@ class MenuInterface():
         self.tsw_page.set_l_value(l_page_name);
 
 
+    def draw_stats_menu(self, window):
+
+        interface_width = self.interface.MENU_WINDOW_WIDTH;
+        interface_height = self.interface.MENU_WINDOW_HEIGHT;
+
+        background_rect = (0, 0, interface_width, interface_height);
+        pygame.draw.rect(window, (101, 13, 27), background_rect);
+
+        font = pygame.font.SysFont("", size=32);
+        img_text_global_stats = font.render("Statistiques globaux", True, (255, 255, 255));
+
+        img_text_global_stats_size = img_text_global_stats.get_size();
+        img_text_global_stats_x = interface_width/2-img_text_global_stats_size[0]/2;
+
+        window.blit(img_text_global_stats, (img_text_global_stats_x, 30));
+
+
+        img_text_player_stats = font.render("Statistiques par joueur", True, (255, 255, 255));
+
+        img_text_player_stats_size = img_text_player_stats.get_size();
+        img_text_player_stats_x = interface_width/2-img_text_player_stats_size[0]/2;
+
+        window.blit(img_text_player_stats, (img_text_player_stats_x, 300));
 
     def draw_widgets(self, window):
 
@@ -428,7 +461,7 @@ class MenuInterface():
                         self.change_page(Page.SaveMenu);
 
                     elif(button.get_text() == "Statistiques"):
-                        #self.change_page(Page.StatsMenu);
+                        self.change_page(Page.StatsMenu);
                         pass;
 
                     elif(button.get_text() == "Suivant"):

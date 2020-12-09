@@ -101,10 +101,12 @@ class GameInterface():
         self.message_placed_word = Message();
         self.message_scrabble = Message();
         self.message_pick_stack = Message();
+        self.message_end_game = Message();
 
         self.l_message.append(self.message_placed_word);
         self.l_message.append(self.message_scrabble);
         self.l_message.append(self.message_pick_stack);
+        self.l_message.append(self.message_end_game);
 
     def init_save_page(self):
 
@@ -597,6 +599,33 @@ class GameInterface():
 
         self.message_pick_stack.show(3);
 
+    def show_message_end_game(self, winner_name, winner_score):
+
+        interface_width = self.interface.GAME_WINDOW_WIDTH;
+        interface_height = self.interface.GAME_WINDOW_HEIGHT;
+
+        if(winner_name != ""):
+            title_text = "Victoire de " + winner_name + " !";
+            subtitle_text = "Il remporte la partie avec " + str(winner_score) + " points";
+        else:
+            title_text = "Egalité !";
+            subtitle_text = "Les deux joueurs égalisent avec " + str(winner_score) + " points";
+
+        self.message_end_game.set_text_title(title_text);
+        self.message_end_game.set_text_subtitle(subtitle_text);
+        self.message_end_game.set_horizontal_alignment(Alignment.Center);
+        self.message_end_game.set_text_title_size(40);
+        self.message_end_game.set_text_subtitle_size(32);
+        self.message_end_game.set_space_between_titles(20);
+        self.message_end_game.set_color_title((0, 0, 0));
+        self.message_end_game.set_color_subtitle((0, 0, 0));
+        self.message_end_game.set_border_color((0, 0, 0));
+        self.message_end_game.set_border_thickness(4);
+
+        self.message_end_game.set_pos((interface_width/2, 200));
+
+        self.message_end_game.show(3);
+
 
     def event(self, e):
 
@@ -766,18 +795,21 @@ class GameInterface():
                                     self.letter_moving_mode = False;
                                     self.letter_moving_index = -1;
 
-                for letter_index in range(len(self.l_joker_letter_choice_rect)):
-                    letter_choice_rect = self.l_joker_letter_choice_rect[letter_index];
 
-                    if(letter_choice_rect.in_bounds(mouse_x, mouse_y)):
+                if(self.joker_choice_mode):
 
-                        self.joker_choice_mode = False;
+                    for letter_index in range(len(self.l_joker_letter_choice_rect)):
+                        letter_choice_rect = self.l_joker_letter_choice_rect[letter_index];
 
-                        game_board = self.game.get_game_board();
-                        l_joker_pos = self.game.get_l_joker_pos();
+                        if(letter_choice_rect.in_bounds(mouse_x, mouse_y)):
 
-                        last_joker_pos = l_joker_pos[-1];
-                        game_board[last_joker_pos[0]][last_joker_pos[1]] = letter_index;
+                            self.joker_choice_mode = False;
+
+                            game_board = self.game.get_game_board();
+                            l_joker_pos = self.game.get_l_joker_pos();
+
+                            last_joker_pos = l_joker_pos[-1];
+                            game_board[last_joker_pos[0]][last_joker_pos[1]] = letter_index;
 
 
         elif(e.type == pygame.MOUSEMOTION):

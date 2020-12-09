@@ -13,8 +13,11 @@ class SaveManager:
 
     def load_save(self, save_name):
 
-        file_save = open(self.save_file_path, "r");
-        data_string = file_save.read();
+        try:
+            file_save = open(self.save_file_path, "r");
+            data_string = file_save.read();
+        except FileNotFoundError:
+            data_string = "{}";
 
         file_save.close();
 
@@ -26,6 +29,7 @@ class SaveManager:
         self.game.set_player_index(data_save["player_index"]);
         self.game.set_game_board(data_save["game_board"]);
         self.game.set_l_joker_pos(data_save["l_joker_pos"]);
+        self.game.set_stack(data_save["stack"]);
 
         l_player = [];
         data_l_player = data_save["l_player"];
@@ -50,8 +54,11 @@ class SaveManager:
 
         date = datetime.today();
 
-        file_save = open(self.save_file_path, "r");
-        data_string = file_save.read();
+        try:
+            file_save = open(self.save_file_path, "r");
+            data_string = file_save.read();
+        except FileNotFoundError:
+            data_string = "{}";
 
         file_save.close();
 
@@ -64,6 +71,7 @@ class SaveManager:
         data_save["player_index"] = game.get_player_index();
         data_save["game_board"] = game.get_game_board();
         data_save["l_joker_pos"] = game.get_l_joker_pos();
+        data_save["stack"] = game.get_stack();
 
         data_save["l_player"] = [];
         for player in game.get_l_player():
@@ -93,8 +101,11 @@ class SaveManager:
 
     def remove_save(self, save_name):
 
-        file_save = open(self.save_file_path, "r");
-        data_string = file_save.read();
+        try:
+            file_save = open(self.save_file_path, "r");
+            data_string = file_save.read();
+        except FileNotFoundError:
+            data_string = "{}";
 
         file_save.close();
 
@@ -111,8 +122,11 @@ class SaveManager:
 
         l_save_name = [];
 
-        file_save = open(self.save_file_path, "r");
-        data_string = file_save.read();
+        try:
+            file_save = open(self.save_file_path, "r");
+            data_string = file_save.read();
+        except FileNotFoundError:
+            data_string = "{}";
 
         data_all_save = json.loads(data_string);
         for save in data_all_save.items():
