@@ -45,6 +45,7 @@ class WordChecker:
         for scrabble_word in scrabble_words:
 
             scrabble_word = scrabble_word.replace("\n", "");
+            scrabble_word = scrabble_word.upper();
 
             for word in l_word_to_check:
 
