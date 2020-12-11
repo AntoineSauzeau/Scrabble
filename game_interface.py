@@ -502,10 +502,14 @@ class GameInterface():
             self.game.set_game_status(GameStatus.Paused);
             self.bttn_pause.set_text("Reprendre la partie");
 
+            self.game.stop_timer();
+            print("loop");
+
         elif(pause == False):
             self.game.set_game_status(GameStatus.InProgress);
-            self.game.loop_timer();
             self.bttn_pause.set_text("Mettre en pause");
+
+            self.game.start_timer();
 
     def show_message_placed_word(self, word, value, player_name):
 
@@ -650,17 +654,19 @@ class GameInterface():
                     if(self.page == Page.Game):
 
                         if(button.get_text() == "Commencer la partie" or button.get_text() == "Reprendre la partie"):
-                            self.game.start_game();
-                            self.bttn_next_round.set_text("Passer au tour suivant");
+
+                            game_status = self.game.get_game_status();
+                            if(game_status == GameStatus.Paused):
+                                self.set_pause(False);
+                            else:
+                                self.game.start_game();
+                                self.bttn_next_round.set_text("Passer au tour suivant");
 
                         elif(button.get_text() == "Retour au menu principal"):
                             self.page = Page.Save;
 
                         elif(button.get_text() == "Mettre en pause"):
                             self.set_pause(True);
-
-                        elif(button.get_text() == "Reprendre la partie"):
-                            self.set_pause(False);
 
                         elif(button.get_text() == "Piocher de nouvelles lettres"):
 

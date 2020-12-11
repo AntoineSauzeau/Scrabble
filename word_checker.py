@@ -108,6 +108,8 @@ class WordChecker:
                     extended_word.append(letter);
 
                 y -= 1
+                if(y == -1):
+                    break;
 
             y = y_min+1
             while(game_board[x][y] != -1):
@@ -118,6 +120,8 @@ class WordChecker:
                     extended_word.append(letter);
 
                 y += 1
+                if(y == 15):
+                    break;
 
         elif(direction == Direction.Horizontal):
 
@@ -134,6 +138,8 @@ class WordChecker:
                     extended_word.append(letter);
 
                 x -= 1
+                if(x == -1):
+                    break;
 
             x = x_min+1
             while(game_board[x][y] != -1):
@@ -143,6 +149,8 @@ class WordChecker:
                     extended_word.append(letter);
 
                 x += 1
+                if(x == 15):
+                    break;
 
         print("Extended word avant tri", extended_word);
 
@@ -322,6 +330,6 @@ class WordChecker:
         total_value += self.count_word_value(main_word);
 
         if(other_word_completed != None):
-            total_value += self.count_word_value(get_other_completed_word);
+            total_value += self.count_word_value(other_word_completed);
 
         return total_value;

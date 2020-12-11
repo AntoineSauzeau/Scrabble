@@ -30,6 +30,8 @@ class SaveManager:
         self.game.set_game_board(data_save["game_board"]);
         self.game.set_l_joker_pos(data_save["l_joker_pos"]);
         self.game.set_stack(data_save["stack"]);
+        self.game.set_l_case_modified_during_round(data_save["l_case_modified_during_round"]);
+        self.game.set_l_case_bonus_covered(data_save["l_case_bonus_covered"]);
 
         l_player = [];
         data_l_player = data_save["l_player"];
@@ -72,6 +74,8 @@ class SaveManager:
         data_save["game_board"] = game.get_game_board();
         data_save["l_joker_pos"] = game.get_l_joker_pos();
         data_save["stack"] = game.get_stack();
+        data_save["l_case_modified_during_round"] = game.get_l_case_modified_during_round();
+        data_save["l_case_bonus_covered"] = game.get_l_case_bonus_covered();
 
         data_save["l_player"] = [];
         for player in game.get_l_player():

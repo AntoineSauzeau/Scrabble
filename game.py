@@ -5,6 +5,7 @@ import random
 from player import Player
 from word_checker import WordChecker
 from save_manager import SaveManager
+from stats import Stats
 from message import Message
 
 class GameStatus(IntEnum):
@@ -39,6 +40,7 @@ class Game():
         self.game_status = GameStatus.NotStarted;
         self.last_round = False;
         self.game_taken_up = False;
+        self.timer = None;
 
         self.game_board = [];       #Liste à 2 dimensions représentant le placement des lettres sur le plateau de jeu
         self.stack = [];
@@ -52,6 +54,9 @@ class Game():
         self.l_case_modified_during_round = [];
         self.word_checker = WordChecker(self);
         self.save_manager = SaveManager(self);
+
+        self.stats = Stats(self);
+        self.stats.load();
 
         self.game_interface = None;
 
@@ -88,10 +93,17 @@ class Game():
         self.loop_timer();
 
     def loop_timer(self):
-        self.played_time += 1;
 
         if(self.game_status == GameStatus.Paused or self.game_status == GameStatus.Finished):
             return;
+
+        self.played_time += 1;
+
+        self.timer = threading.Timer(1, self.loop_timer);
+        self.timer.daemon = True;
+        self.timer.start();
+
+    def start_timer(self):
 
         self.timer = threading.Timer(1, self.loop_timer);
         self.timer.daemon = True;
@@ -226,6 +238,7 @@ class Game():
                 player_easel = player.get_easel();
                 if(player_easel.empty()):
                     self.end_game();
+                    return;
 
 
 
@@ -372,7 +385,9 @@ class Game():
     def end_game(self):
 
         self.game_status = GameStatus.Finished;
+        '''global_stats = self.stats.get_l_global_stats();
 
+        global_stats["n_game"] += 1;'''
 
         finisher_player = None;
         for player in self.l_player:
@@ -401,6 +416,7 @@ class Game():
                 finisher_bonus += easel_value;
 
         finisher_player.add_score(finisher_bonus);
+        #self.stats.save();
 
         winner = None;
         first_player_score = -1;
@@ -422,6 +438,7 @@ class Game():
         winner_name = winner.get_name();
         self.game_interface.show_message_end_game(winner_name, first_player_score);
 
+        #self.stats.save();
 
 
 
