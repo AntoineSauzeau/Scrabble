@@ -52,6 +52,9 @@ class MenuInterface():
         self.init_save_menu();
         self.init_stats_menu();
 
+        self.stats = Stats();
+        self.stats.load();
+
 
     def init_main_menu(self):
 
@@ -391,7 +394,29 @@ class MenuInterface():
 
         window.blit(img_text_global_stats, (img_text_global_stats_x, 30));
 
+        l_global_stats = self.stats.get_l_global_stats();
 
+        font = pygame.font.SysFont("", size=26);
+
+        text_n_game = "Nombre de partie : " + str(l_global_stats["n_game"]);
+        text_n_scrabble = "Nombre de scrabble : " + str(l_global_stats["n_scrabble"]);
+        text_n_placed_letter = "Nombre de lettres placées : " + str(l_global_stats["n_placed_letter"]);
+        text_n_placed_word = "Nombre de mots placés : " + str(l_global_stats["n_placed_word"]);
+        text_played_time = "Temps joué : " + str(l_global_stats["time_played"]);
+
+        img_text_n_game = font.render(text_n_game, True, (255, 255, 255));
+        img_text_n_scrabble = font.render(text_n_scrabble, True, (255, 255, 255));
+        img_text_n_placed_letter = font.render(text_n_placed_letter, True, (255, 255, 255));
+        img_text_n_placed_word = font.render(text_n_placed_word, True, (255, 255, 255));
+        img_text_played_time = font.render(text_played_time, True, (255, 255, 255));
+
+        window.blit(img_text_n_game, (16, 90));
+        window.blit(img_text_n_scrabble, (16, 110));
+        window.blit(img_text_n_placed_letter, (16, 130));
+        window.blit(img_text_n_placed_word, (16, 150));
+        window.blit(img_text_played_time, (16, 170));
+
+        font = pygame.font.SysFont("", size=32);
         img_text_player_stats = font.render("Statistiques par joueur", True, (255, 255, 255));
 
         img_text_player_stats_size = img_text_player_stats.get_size();

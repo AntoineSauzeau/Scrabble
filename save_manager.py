@@ -51,6 +51,7 @@ class SaveManager:
         self.game.set_l_player(l_player);
 
         self.game.set_game_taken_up(True);
+        self.game.load_game();
 
     def create_save(self):
 

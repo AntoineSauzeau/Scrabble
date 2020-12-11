@@ -4,8 +4,12 @@ class Player:
     def __init__(self, name=""):
 
         self.name = name;
-        self.score = 0
+        self.score = 0;
         self.easel = Easel(self);    #Stocke les lettres contenu dans le chevalet
+
+        self.n_placed_letter = 0;
+        self.n_placed_word = 0;
+        self.n_scrabble = 0;
 
     def add_score(self, value):
         self.score += value;
@@ -21,6 +25,15 @@ class Player:
     def get_easel(self):
         return self.easel;
 
+    def get_n_placed_letter(self):
+        return self.n_placed_letter;
+
+    def get_n_placed_word(self):
+        return self.n_placed_word;
+
+    def get_n_scrabble(self):
+        return self.n_scrabble;
+
     def set_score(self, score):
         self.score = score;
 
@@ -29,6 +42,15 @@ class Player:
 
     def set_easel(self, easel):
         self.easel = easel;
+
+    def set_n_placed_letter(self, n_placed_letter):
+        self.n_placed_letter = n_placed_letter;
+
+    def set_n_placed_word(self, n_placed_word):
+        self.n_placed_word = n_placed_word;
+
+    def set_n_scrabble(self, scrabble):
+        self.n_scrabble = n_scrabble
 
     def set_game_instance(self, game):
         self.game = game;
@@ -86,7 +108,7 @@ class Easel:
             letter_index = self.l_letter[i];
             if(letter_index == -1):
                 continue;
-                
+
             letter = chr(letter_index+65);
 
             letter_value = l_letter_information[letter]["val"];

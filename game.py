@@ -56,7 +56,14 @@ class Game():
         self.save_manager = SaveManager(self);
 
         self.stats = Stats(self);
-        self.stats.load();
+
+        if(self.game_taken_up == False):
+            self.stats.load();
+
+
+        self.n_placed_letter = 0;
+        self.n_placed_word = 0;
+        self.n_scrabble = 0;
 
         self.game_interface = None;
 
@@ -198,6 +205,20 @@ class Game():
                 self.game_interface.show_message_placed_word(word_placed, total_value_placed, player_name);
                 if(len(self.l_case_modified_during_round) == 7):
                     self.game_interface.show_message_scrabble(player_name);
+
+                    self.n_scrabble += 1;
+                    n_player_scrabble = player.get_n_scrabble();
+                    n_player_scrabble += 1;
+
+                self.n_placed_word += 1;
+                n_player_placed_word = player.get_n_placed_word();
+                n_player_placed_word += 1;
+
+                self.n_placed_letter += len(self.l_case_modified_during_round);
+                n_player_placed_letter = player.get_n_placed_letter();
+                n_player_placed_letter += 1;
+
+
 
             else:
                 self.remove_letter_on_game_board(self.l_case_modified_during_round);
@@ -382,12 +403,13 @@ class Game():
     def save_game(self):
         self.save_manager.create_save();
 
+    #A exécuter après le chargement d'une sauvegarde
+    def load_game(self):
+        self.stats.load();
+
     def end_game(self):
 
         self.game_status = GameStatus.Finished;
-        '''global_stats = self.stats.get_l_global_stats();
-
-        global_stats["n_game"] += 1;'''
 
         finisher_player = None;
         for player in self.l_player:
@@ -416,7 +438,7 @@ class Game():
                 finisher_bonus += easel_value;
 
         finisher_player.add_score(finisher_bonus);
-        #self.stats.save();
+
 
         winner = None;
         first_player_score = -1;
@@ -438,7 +460,36 @@ class Game():
         winner_name = winner.get_name();
         self.game_interface.show_message_end_game(winner_name, first_player_score);
 
-        #self.stats.save();
+        #STATS
+
+        global_stats = self.stats.get_l_global_stats();
+
+        print(global_stats);
+        global_stats["n_game"] += 1;
+        global_stats["n_scrabble"] += self.n_scrabble;
+        global_stats["n_placed_letter"] += self.n_placed_letter;
+        global_stats["n_placed_word"] += self.n_placed_word;
+        global_stats["time_played"] += self.played_time;
+        print(global_stats);
+
+        l_player_stats = self.stats.get_l_player_stats();
+        for player in self.l_player:
+
+            player_name = player.get_name();
+            player_stats = l_player_stats[player_name];
+
+            player_stats["n_scrabble"] += player.get_n_scrabble();
+            player_stats["n_placed_letter"] += player.get_n_placed_letter();
+            player_stats["n_placed_word"] += player.get_n_placed_word();
+            player_stats["time_played"] += self.played_time;
+
+            if(player == winner):
+                player_stats["n_win"] += 1;
+            else:
+                player_stats["n_lose"] += 1;
+
+
+        self.stats.save();
 
 
 
@@ -522,7 +573,7 @@ class Game():
         return self.l_joker_pos;
 
     def get_game_taken_up(self):
-        return self.game_taken_up;
+        return self.game_taken_up
 
     def set_game_status(self, game_status):
         self.game_status = game_status;
