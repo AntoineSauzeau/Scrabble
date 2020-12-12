@@ -22,12 +22,12 @@ class Controller():
         while(not(self.exit)):
 
             try:
-
                 for event in pygame.event.get():
 
                     self.interface.event(event);
 
-                    self.interface.draw();
+                self.interface.draw();
+
             except:
                 self.interface.get_game_interface().get_game_instance().create_save();
 
