@@ -21,11 +21,15 @@ class Controller():
         clock = pygame.time.Clock();
         while(not(self.exit)):
 
-            for event in pygame.event.get():
+            try:
 
-                self.interface.event(event);
+                for event in pygame.event.get():
 
-            self.interface.draw();
+                    self.interface.event(event);
+
+                    self.interface.draw();
+            except:
+                self.interface.get_game_interface().get_game_instance().create_save();
 
             clock.tick(self.FPS);
 
