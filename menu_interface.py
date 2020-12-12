@@ -20,6 +20,7 @@ class Page(IntEnum):
     GameMenu = 1,
     SaveMenu = 2,
     StatsMenu = 3
+    SettingsMenu = 4
 
 class MenuInterface():
 
@@ -32,9 +33,9 @@ class MenuInterface():
 
         self.save_manager = SaveManager();
 
-        self.l_button_by_page = [[], [], [], []];
-        self.l_tew_by_page = [[], [], [], []];       #TextEditWidget
-        self.l_tsw_by_page = [[], [], [], []];       #TextSwitchWidget
+        self.l_button_by_page = [[], [], [], [], []];
+        self.l_tew_by_page = [[], [], [], [], []];       #TextEditWidget
+        self.l_tsw_by_page = [[], [], [], [], []];       #TextSwitchWidget
 
         self.key_pressed = None;
 
@@ -47,13 +48,14 @@ class MenuInterface():
         self.load_images();
         self.stats = Stats();
 
+        self.stats = Stats();
+        self.stats.load();
+
         self.init_main_menu();
         self.init_game_menu();
         self.init_save_menu();
         self.init_stats_menu();
 
-        self.stats = Stats();
-        self.stats.load();
 
 
     def init_main_menu(self):
@@ -195,6 +197,15 @@ class MenuInterface():
 
         page = Page.StatsMenu;
         self.l_button_by_page[page].append(bttn_back);
+
+        tsw_player_stats_page = TextSwitchWidget();
+        tsw_player_stats_page.set_pos(interface_width/2, 330);
+        tsw_player_stats_page.set_text_size(16);
+
+        l_player_name = self.stats.get_l_player_name(); print(l_player_name);
+        tsw_player_stats_page.set_l_value(l_player_name);
+
+        self.l_tsw_by_page[page].append(tsw_player_stats_page);
 
 
 
@@ -411,10 +422,10 @@ class MenuInterface():
         img_text_played_time = font.render(text_played_time, True, (255, 255, 255));
 
         window.blit(img_text_n_game, (16, 90));
-        window.blit(img_text_n_scrabble, (16, 110));
-        window.blit(img_text_n_placed_letter, (16, 130));
-        window.blit(img_text_n_placed_word, (16, 150));
-        window.blit(img_text_played_time, (16, 170));
+        window.blit(img_text_n_scrabble, (16, 120));
+        window.blit(img_text_n_placed_letter, (16, 150));
+        window.blit(img_text_n_placed_word, (16, 180));
+        window.blit(img_text_played_time, (16, 210));
 
         font = pygame.font.SysFont("", size=32);
         img_text_player_stats = font.render("Statistiques par joueur", True, (255, 255, 255));
@@ -422,7 +433,7 @@ class MenuInterface():
         img_text_player_stats_size = img_text_player_stats.get_size();
         img_text_player_stats_x = interface_width/2-img_text_player_stats_size[0]/2;
 
-        window.blit(img_text_player_stats, (img_text_player_stats_x, 300));
+        window.blit(img_text_player_stats, (img_text_player_stats_x, 285));
 
     def draw_widgets(self, window):
 

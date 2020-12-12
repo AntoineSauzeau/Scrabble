@@ -521,7 +521,7 @@ class GameInterface():
             subtitle_text = "Il remporte " + str(value) + " points !";
         else:
             title_text = "Le joueur " + player_name + " a posé le mot " + word;
-            subtitle_text = "Ce mot n'est pas valable, il remporte aucun point";
+            subtitle_text = "Ce mot n'est pas valable, il ne remporte aucun point";
 
         self.message_placed_word.set_text_title(title_text);
         self.message_placed_word.set_text_subtitle(subtitle_text);

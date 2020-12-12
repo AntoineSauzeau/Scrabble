@@ -234,10 +234,22 @@ class WordChecker:
             letter_x = letter[0];
             letter_y = letter[1];
 
-            if(game_board[letter_x-1][letter_y] != -1 or game_board[letter_x+1][letter_y] != -1):
-                direction = Direction.Horizontal;
-            elif(game_board[letter_x][letter_y-1] != -1 or game_board[letter_x][letter_y+1] != -1):
-                direction = Direction.Vertical;
+            if(letter_x-1 != -1):
+                if(game_board[letter_x-1][letter_y] != -1):
+                    direction = Direction.Horizontal;
+
+            elif(letter_x+1 != 15):
+                if(game_board[letter_x+1][letter_y] != -1):
+                    direction = Direction.Horizontal;
+
+            elif(letter_y-1 != -1):
+                if(game_board[letter_x][letter_y-1] != -1):
+                    direction = Direction.Vertical;
+
+            elif(letter_y+1 != 15):
+                if(game_board[letter_x][letter_y+1] != -1):
+                    direction = Direction.Vertical;
+
 
         return direction;
 
@@ -257,13 +269,23 @@ class WordChecker:
 
             if(main_word_direction == Direction.Vertical):
 
-                if(game_board[letter_x-1][letter_y] != -1 or game_board[letter_x+1][letter_y] != -1):
-                    completed_word = self.get_extended_word(Direction.Horizontal, [letter_pos]);
+                if(letter_x-1 != -1):
+                    if(game_board[letter_x-1][letter_y] != -1):
+                        completed_word = self.get_extended_word(Direction.Horizontal, [letter_pos]);
+
+                elif(letter_x+1 != 15):
+                    if(game_board[letter_x+1][letter_y] != -1):
+                        completed_word = self.get_extended_word(Direction.Horizontal, [letter_pos]);
 
             elif(main_word_direction == Direction.Horizontal):
 
-                if(game_board[letter_x][letter_y-1] != -1 or game_board[letter_x][letter_y+1] != -1):
-                    completed_word = self.get_extended_word(Direction.Vertical, [letter_pos]);
+                if(letter_y-1 != -1):
+                    if(game_board[letter_x][letter_y-1] != -1):
+                        completed_word = self.get_extended_word(Direction.Vertical, [letter_pos]);
+
+                elif(letter_y+1 != 15):
+                    if(game_board[letter_x][letter_y+1] != -1):
+                        completed_word = self.get_extended_word(Direction.Vertical, [letter_pos]);
 
         return completed_word;
 
