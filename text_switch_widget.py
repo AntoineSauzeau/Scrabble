@@ -131,3 +131,6 @@ class TextSwitchWidget:
 
     def get_index(self):
         return self.index;
+
+    def get_displayed_value(self):
+        return self.l_value[self.index];

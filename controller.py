@@ -29,7 +29,14 @@ class Controller():
                 self.interface.draw();
 
             except:
-                self.interface.get_game_interface().get_game_instance().create_save();
+
+                #En cas de crash du programme on sauvegarde la partie si une partie était en cours
+                game_interface = self.interface.get_game_interface();
+                if(game_interface != None):
+
+                    game = game_interface.get_game_instance();
+                    if(game != None):
+                        game.create_save();
 
             clock.tick(self.FPS);
 

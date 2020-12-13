@@ -87,11 +87,16 @@ class Stats:
         return self.l_player_stats.keys();
 
 
-    def reset_all(self):
-        pass;
+    def reset(self):
 
-    def reset_player(self, player_name):
-        pass;
+        data_stats = {};
+        data_stats["l_global_stats"] = {};
+        data_stats["l_player_stats"] = {};
+
+        file_stats = open(self.stats_file_path, "w");
+        json.dump(data_stats, file_stats);
+
+        file_stats.close();
 
 
     def get_player_stats(self, player_name):

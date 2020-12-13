@@ -195,17 +195,28 @@ class MenuInterface():
         bttn_back.set_border(True);
         bttn_back.set_border_thickness(3);
 
+        bttn_reset = Button("Réinitialiser");
+        bttn_reset.set_text_size(24);
+        bttn_reset.set_padding(10);
+        bttn_reset.set_pos((interface_width-71, interface_height-30));
+        bttn_reset.set_border(True);
+        bttn_reset.set_border_thickness(3);
+
         page = Page.StatsMenu;
         self.l_button_by_page[page].append(bttn_back);
+        self.l_button_by_page[page].append(bttn_reset);
 
-        tsw_player_stats_page = TextSwitchWidget();
-        tsw_player_stats_page.set_pos(interface_width/2, 330);
-        tsw_player_stats_page.set_text_size(16);
+        self.tsw_player_stats_page = TextSwitchWidget();
+        self.tsw_player_stats_page.set_pos(interface_width/2, 502);
+        self.tsw_player_stats_page.set_text_size(13);
 
         l_player_name = self.stats.get_l_player_name(); print(l_player_name);
-        tsw_player_stats_page.set_l_value(l_player_name);
+        if(len(l_player_name) != 0):
+            self.tsw_player_stats_page.set_l_value(l_player_name);
+        else:
+            self.tsw_player_stats_page.set_l_value(["Aucun joueur"]);
 
-        self.l_tsw_by_page[page].append(tsw_player_stats_page);
+        self.l_tsw_by_page[page].append(self.tsw_player_stats_page);
 
 
 
@@ -395,7 +406,7 @@ class MenuInterface():
         interface_height = self.interface.MENU_WINDOW_HEIGHT;
 
         background_rect = (0, 0, interface_width, interface_height);
-        pygame.draw.rect(window, (101, 13, 27), background_rect);
+        pygame.draw.rect(window, (105, 56, 92), background_rect);
 
         font = pygame.font.SysFont("", size=32);
         img_text_global_stats = font.render("Statistiques globaux", True, (255, 255, 255));
@@ -403,7 +414,7 @@ class MenuInterface():
         img_text_global_stats_size = img_text_global_stats.get_size();
         img_text_global_stats_x = interface_width/2-img_text_global_stats_size[0]/2;
 
-        window.blit(img_text_global_stats, (img_text_global_stats_x, 30));
+        window.blit(img_text_global_stats, (img_text_global_stats_x, 20));
 
         l_global_stats = self.stats.get_l_global_stats();
 
@@ -421,11 +432,17 @@ class MenuInterface():
         img_text_n_placed_word = font.render(text_n_placed_word, True, (255, 255, 255));
         img_text_played_time = font.render(text_played_time, True, (255, 255, 255));
 
-        window.blit(img_text_n_game, (16, 90));
-        window.blit(img_text_n_scrabble, (16, 120));
-        window.blit(img_text_n_placed_letter, (16, 150));
-        window.blit(img_text_n_placed_word, (16, 180));
-        window.blit(img_text_played_time, (16, 210));
+        window.blit(img_text_n_game, (32, 70));
+        window.blit(img_text_n_scrabble, (32, 100));
+        window.blit(img_text_n_placed_letter, (32, 130));
+        window.blit(img_text_n_placed_word, (32, 160));
+        window.blit(img_text_played_time, (32, 190));
+
+        img_text_played_time_size = img_text_played_time.get_size();
+        line_start_pos = (20, 70);
+        line_end_pos = (20, 190 + img_text_played_time_size[1]);
+
+        pygame.draw.line(window, (255, 255, 255), line_start_pos, line_end_pos, 6);
 
         font = pygame.font.SysFont("", size=32);
         img_text_player_stats = font.render("Statistiques par joueur", True, (255, 255, 255));
@@ -433,7 +450,60 @@ class MenuInterface():
         img_text_player_stats_size = img_text_player_stats.get_size();
         img_text_player_stats_x = interface_width/2-img_text_player_stats_size[0]/2;
 
-        window.blit(img_text_player_stats, (img_text_player_stats_x, 285));
+        window.blit(img_text_player_stats, (img_text_player_stats_x, 240));
+
+        l_player_stats = self.stats.get_l_player_stats();
+        if(len(l_player_stats) == 0):
+
+            n_win = 0;
+            n_lose = 0;
+            n_scrabble = 0;
+            n_placed_letter = 0;
+            n_placed_word = 0;
+            time_played = 0;
+
+        else:
+
+            player_name = self.tsw_player_stats_page.get_displayed_value();
+            player_stats = l_player_stats[player_name];
+
+            n_win = player_stats["n_win"];
+            n_lose = player_stats["n_lose"];
+            n_scrabble = player_stats["n_scrabble"];
+            n_placed_letter = player_stats["n_placed_letter"];
+            n_placed_word = player_stats["n_placed_word"];
+            time_played = player_stats["time_played"];
+
+        text_n_win = "Nombre de partie gagné : " + str(n_win);
+        text_n_lose = "Nombre de partie perdu : " + str(n_lose);
+        text_n_scrabble = "Nombre de scrabble : " + str(n_scrabble);
+        text_n_placed_letter = "Nombre de lettre posée : " + str(n_placed_letter);
+        text_n_placed_word = "Nombre de mot posé : " + str(n_placed_word);
+        text_time_played = "Temps joué : " + str(time_played);
+
+        font = pygame.font.SysFont("", size=26);
+
+        img_text_n_win = font.render(text_n_win, True, (255, 255, 255));
+        img_text_n_lose = font.render(text_n_lose, True, (255, 255, 255));
+        img_text_n_scrabble = font.render(text_n_scrabble, True, (255, 255, 255));
+        img_text_n_placed_letter = font.render(text_n_placed_letter, True, (255, 255, 255));
+        img_text_n_placed_word = font.render(text_n_placed_word, True, (255, 255, 255));
+        img_text_time_played = font.render(text_time_played, True, (255, 255, 255));
+
+        window.blit(img_text_n_win, (32, 290));
+        window.blit(img_text_n_lose, (32, 320));
+        window.blit(img_text_n_scrabble, (32, 350));
+        window.blit(img_text_n_placed_letter, (32, 380));
+        window.blit(img_text_n_placed_word, (32, 410));
+        window.blit(img_text_time_played, (32, 440));
+
+        img_text_time_played_size = img_text_time_played.get_size();
+        line_start_pos = (20, 290);
+        line_end_pos = (20, 440 + img_text_time_played_size[1]);
+
+        pygame.draw.line(window, (255, 255, 255), line_start_pos, line_end_pos, 6);
+
+
 
     def draw_widgets(self, window):
 
@@ -523,6 +593,9 @@ class MenuInterface():
                     elif(button.get_text() == "Retour"):
                         self.change_page(Page.MainMenu);
                         self.l_img_text_save_rect.clear();
+
+                    elif(button.get_text() == "Réinitialiser"):
+                        self.stats.reset();
 
 
             for tsw in self.l_tsw_by_page[i_page]:
