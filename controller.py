@@ -28,7 +28,12 @@ class Controller():
 
                 self.interface.draw();
 
-            except:
+            except KeyboardInterrupt:
+                self.quit();
+
+            except Exception as err:
+
+                print(err);
 
                 #En cas de crash du programme on sauvegarde la partie si une partie était en cours
                 game_interface = self.interface.get_game_interface();

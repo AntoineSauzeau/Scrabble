@@ -1,5 +1,7 @@
 from enum import IntEnum
+
 import game
+from settings import Settings
 
 class Direction(IntEnum):
     Horizontal = 0,
@@ -10,7 +12,14 @@ class WordChecker:
     def __init__(self, game):
 
         self.game = game;
-        self.file_scrabble_words_path = "scrabble_words.txt";
+
+        settings_instance = Settings();
+        settings = settings_instance.get_l_settings();
+
+        if(settings["dict_index"] == 0):
+            self.file_scrabble_words_path = "scrabble_words_1.txt";
+        elif(settings["dict_index"] == 1):
+            self.file_scrabble_words_path = "scrabble_words_2.txt";
 
     def is_valid_word(self):
 

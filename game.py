@@ -212,11 +212,11 @@ class Game():
 
                 self.n_placed_word += 1;
                 n_player_placed_word = player.get_n_placed_word();
-                n_player_placed_word += 1;
+                player.set_n_placed_word(n_player_placed_word+1);
 
                 self.n_placed_letter += len(self.l_case_modified_during_round);
                 n_player_placed_letter = player.get_n_placed_letter();
-                n_player_placed_letter += 1;
+                player.set_n_placed_letter(n_player_placed_letter+1);
 
 
 
@@ -382,14 +382,18 @@ class Game():
 
     def has_letter_around(self, case_x, case_y):
 
-        if(self.game_board[case_x-1][case_y] != -1):
-            return True;
-        elif(self.game_board[case_x][case_y-1] != -1):
-            return True;
-        elif(self.game_board[case_x+1][case_y] != -1):
-            return True;
-        elif(self.game_board[case_x][case_y+1] != -1):
-            return True;
+        if(case_x-1 != -1):
+            if(self.game_board[case_x-1][case_y] != -1):
+                return True;
+        if(case_y-1 != -1):
+            if(self.game_board[case_x][case_y-1] != -1):
+                return True;
+        if(case_x+1 != 15):
+            if(self.game_board[case_x+1][case_y] != -1):
+                return True;
+        if(case_y+1 != 15):
+            if(self.game_board[case_x][case_y+1] != -1):
+                return True;
 
 
     def desactivate_covered_bonus(self):
@@ -575,6 +579,15 @@ class Game():
     def get_game_taken_up(self):
         return self.game_taken_up
 
+    def get_n_placed_letter(self):
+        return self.n_placed_letter;
+
+    def get_n_placed_word(self):
+        return self.n_placed_word;
+
+    def get_n_scrabble(self):
+        return self.n_scrabble;
+
     def set_game_status(self, game_status):
         self.game_status = game_status;
 
@@ -622,3 +635,12 @@ class Game():
 
     def set_game_taken_up(self, game_taken_up):
         self.game_taken_up = game_taken_up;
+
+    def set_n_placed_letter(self, n_placed_letter):
+        self.n_placed_letter = n_placed_letter;
+
+    def set_n_placed_word(self, n_placed_word):
+        self.n_placed_word = n_placed_word;
+
+    def set_n_scrabble(self, n_scrabble):
+        self.n_scrabble = n_scrabble;

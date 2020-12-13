@@ -32,6 +32,10 @@ class SaveManager:
         self.game.set_stack(data_save["stack"]);
         self.game.set_l_case_modified_during_round(data_save["l_case_modified_during_round"]);
         self.game.set_l_case_bonus_covered(data_save["l_case_bonus_covered"]);
+        self.game.set_n_placed_letter(data_save["n_placed_letter"]);
+        self.game.set_n_placed_word(data_save["n_placed_word"]);
+        self.game.set_n_scrabble(data_save["n_scrabble"]);
+
 
         l_player = [];
         data_l_player = data_save["l_player"];
@@ -40,6 +44,9 @@ class SaveManager:
             player = Player();
             player.set_name(data_player["name"]);
             player.set_score(data_player["score"]);
+            player.set_n_placed_letter(data_save["n_placed_letter"]);
+            player.set_n_placed_word(data_save["n_placed_word"]);
+            player.set_n_scrabble(data_save["n_scrabble"]);
 
             easel = player.get_easel();
             easel_data = data_player["easel"];
@@ -77,6 +84,9 @@ class SaveManager:
         data_save["stack"] = game.get_stack();
         data_save["l_case_modified_during_round"] = game.get_l_case_modified_during_round();
         data_save["l_case_bonus_covered"] = game.get_l_case_bonus_covered();
+        data_save["n_placed_letter"] = game.get_n_placed_letter();
+        data_save["n_placed_word"] = game.get_n_placed_word();
+        data_save["n_scrabble"] = game.get_n_scrabble();
 
         data_save["l_player"] = [];
         for player in game.get_l_player():
@@ -85,6 +95,9 @@ class SaveManager:
 
             player_data["name"] = player.get_name();
             player_data["score"] = player.get_score();
+            player_data["n_placed_letter"] = player.get_n_placed_letter();
+            player_data["n_placed_word"] = player.get_n_placed_word();
+            player_data["n_scrabble"] = player.get_n_scrabble();
 
             easel = player.get_easel();
             easel_data = {};
@@ -121,6 +134,11 @@ class SaveManager:
         json.dump(data_all_save, file_save);
 
         file_save.close();
+
+    def reset(self):
+
+        file_save = open(self.save_file_path, "w");
+        file_save.write("{}");
 
 
     def get_l_save_name(self):

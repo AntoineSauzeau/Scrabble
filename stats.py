@@ -83,8 +83,7 @@ class Stats:
         file_stats.close();
 
     def get_l_player_name(self):
-
-        return self.l_player_stats.keys();
+        return list(self.l_player_stats.keys());
 
 
     def reset(self):
@@ -98,6 +97,8 @@ class Stats:
 
         file_stats.close();
 
+        self.load();
+
 
     def get_player_stats(self, player_name):
         pass;
@@ -109,4 +110,4 @@ class Stats:
         return self.l_player_stats;
 
     def set_game_instance(self, game):
-        self.game_ = game;
+        self.game = game;

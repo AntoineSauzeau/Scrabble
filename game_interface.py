@@ -609,7 +609,7 @@ class GameInterface():
         interface_height = self.interface.GAME_WINDOW_HEIGHT;
 
         if(winner_name != ""):
-            title_text = "Victoire de " + winner_name + " !";
+            title_text = "Victoire de " + winner_name + " !!!";
             subtitle_text = "Il remporte la partie avec " + str(winner_score) + " points";
         else:
             title_text = "Egalité !";
@@ -625,10 +625,11 @@ class GameInterface():
         self.message_end_game.set_color_subtitle((0, 0, 0));
         self.message_end_game.set_border_color((0, 0, 0));
         self.message_end_game.set_border_thickness(4);
+        self.message_end_game.set_padding(17);
 
         self.message_end_game.set_pos((interface_width/2, 200));
 
-        self.message_end_game.show(3);
+        self.message_placed_word.add_queued_message(self.message_end_game, 12);
 
 
     def event(self, e):
@@ -640,13 +641,12 @@ class GameInterface():
             self.page = Page.Save;
             self.exit_after_save_window = True;
 
-
         elif(e.type == pygame.MOUSEBUTTONUP):
 
-            for button in self.l_button_to_draw_by_page[self.page]:
+            mouse_x = e.pos[0];
+            mouse_y = e.pos[1];
 
-                mouse_x = e.pos[0];
-                mouse_y = e.pos[1];
+            for button in self.l_button_to_draw_by_page[self.page]:
 
                 #Gestion du click sur les boutons
                 if(button.in_bounds(mouse_x, mouse_y)):
@@ -802,7 +802,14 @@ class GameInterface():
                                     self.letter_moving_index = -1;
 
 
-                if(self.joker_choice_mode):
+        elif(e.type == pygame.MOUSEBUTTONDOWN):
+
+            mouse_x = e.pos[0];
+            mouse_y = e.pos[1];
+
+            if(self.joker_choice_mode):
+
+                for button in self.l_button_to_draw_by_page[self.page]:
 
                     for letter_index in range(len(self.l_joker_letter_choice_rect)):
                         letter_choice_rect = self.l_joker_letter_choice_rect[letter_index];
@@ -820,10 +827,10 @@ class GameInterface():
 
         elif(e.type == pygame.MOUSEMOTION):
 
-            for button in self.l_button_to_draw_by_page[self.page]:
+            mouse_x = e.pos[0];
+            mouse_y = e.pos[1];
 
-                mouse_x = e.pos[0];
-                mouse_y = e.pos[1];
+            for button in self.l_button_to_draw_by_page[self.page]:
 
                 if(button.in_bounds(mouse_x, mouse_y)):
                     button.highlight(0, (23, 192, 187));

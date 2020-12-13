@@ -14,6 +14,7 @@ from text_edit_widget import TextEditWidget
 from text_switch_widget import TextSwitchWidget
 from save_manager import SaveManager
 from stats import Stats
+from settings import Settings
 
 class Page(IntEnum):
     MainMenu = 0,
@@ -51,10 +52,13 @@ class MenuInterface():
         self.stats = Stats();
         self.stats.load();
 
+        self.settings_instance = None;
+
         self.init_main_menu();
         self.init_game_menu();
         self.init_save_menu();
         self.init_stats_menu();
+        self.init_settings_menu();
 
 
 
@@ -155,10 +159,10 @@ class MenuInterface():
         interface_width = self.interface.MENU_WINDOW_WIDTH;
         interface_height = self.interface.MENU_WINDOW_HEIGHT;
 
-        bttn_load = Button("Charger");
+        bttn_load = Button("Tout supprimer");
         bttn_load.set_text_size(24);
         bttn_load.set_padding(10);
-        bttn_load.set_pos((interface_width-55, interface_height-30));
+        bttn_load.set_pos((interface_width-84, interface_height-30));
         bttn_load.set_border(True);
         bttn_load.set_border_thickness(3);
 
@@ -218,6 +222,37 @@ class MenuInterface():
 
         self.l_tsw_by_page[page].append(self.tsw_player_stats_page);
 
+    def init_settings_menu(self):
+
+        interface_width = self.interface.MENU_WINDOW_WIDTH;
+        interface_height = self.interface.MENU_WINDOW_HEIGHT;
+
+        bttn_back = Button("Retour");
+        bttn_back.set_text_size(24);
+        bttn_back.set_padding(10);
+        bttn_back.set_pos((50, interface_height-30));
+        bttn_back.set_border(True);
+        bttn_back.set_border_thickness(3);
+
+        page = Page.SettingsMenu;
+        self.l_button_by_page[page].append(bttn_back);
+
+        self.settings_instance = Settings();
+        settings = self.settings_instance.get_l_settings();
+
+        self.tsw_dictionary = TextSwitchWidget();
+        self.tsw_dictionary.set_pos(interface_width/2, 200);
+        self.tsw_dictionary.set_text_size(23);
+
+        l_tsw_value = ["Officiel du scrabble", "Dictionnaire plus complet"];
+        self.tsw_dictionary.set_l_value(l_tsw_value);
+        self.tsw_dictionary.set_index(settings["dict_index"]);
+
+        self.l_tsw_by_page[page].append(self.tsw_dictionary);
+
+
+
+
 
 
     #Fonctions draw
@@ -233,6 +268,8 @@ class MenuInterface():
             self.draw_save_menu(window);
         elif(self.page == Page.StatsMenu):
             self.draw_stats_menu(window);
+        elif(self.page == Page.SettingsMenu):
+            self.draw_settings_menu(window);
 
         self.draw_widgets(window);
 
@@ -505,6 +542,27 @@ class MenuInterface():
 
 
 
+    def draw_settings_menu(self, window):
+
+        interface_width = self.interface.MENU_WINDOW_WIDTH;
+        interface_height = self.interface.MENU_WINDOW_HEIGHT;
+
+        background_rect = (0, 0, interface_width, interface_height);
+        pygame.draw.rect(window, (123, 62, 25), background_rect);
+
+        font = pygame.font.SysFont("", size=33);
+
+        img_text_choose_dict = font.render("-- Choix du dictionnaire --", True, (255, 255, 255));
+
+        img_text_choose_dict_size = img_text_choose_dict.get_size();
+        img_text_choose_dict_x = interface_width/2 - img_text_choose_dict_size[0]/2;
+
+        window.blit(img_text_choose_dict, (img_text_choose_dict_x, 150));
+
+
+
+
+
     def draw_widgets(self, window):
 
         for button in self.l_button_by_page[self.page]:
@@ -568,7 +626,9 @@ class MenuInterface():
 
                     elif(button.get_text() == "Statistiques"):
                         self.change_page(Page.StatsMenu);
-                        pass;
+
+                    elif(button.get_text() == "Paramètres"):
+                        self.change_page(Page.SettingsMenu);
 
                     elif(button.get_text() == "Suivant"):
 
@@ -597,6 +657,9 @@ class MenuInterface():
                     elif(button.get_text() == "Réinitialiser"):
                         self.stats.reset();
 
+                    elif(button.get_text() == "Tout supprimer"):
+                        self.save_manager.reset();
+
 
             for tsw in self.l_tsw_by_page[i_page]:
 
@@ -604,6 +667,12 @@ class MenuInterface():
                     tsw.previous();
                 elif(tsw.in_arrow_right_bounds(mouse_x, mouse_y)):
                     tsw.next();
+
+                if(tsw == self.tsw_dictionary):
+                    settings = self.settings_instance.get_l_settings();
+                    settings["dict_index"] = tsw.get_index();
+
+                    self.settings_instance.save();
 
             self.save_page_index = self.tsw_page.get_index();
 

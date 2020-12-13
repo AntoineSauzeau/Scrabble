@@ -60,7 +60,7 @@ class TextSwitchWidget:
         if(self.index-1 != -1):
             self.index -= 1;
         else:
-            self.index = 0;
+            self.index = len(self.l_value)-1;
 
     def in_arrow_left_bounds(self, x, y):
 
@@ -128,6 +128,9 @@ class TextSwitchWidget:
 
     def set_text_color(self, text_color):
         self.text_color = text_color;
+
+    def set_index(self, index):
+        self.index = index;
 
     def get_index(self):
         return self.index;
