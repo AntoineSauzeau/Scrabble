@@ -5,9 +5,11 @@ class ShapeType:
     Rectangle = 0,
     Line = 1
 
-''' Cette classe a vocation à rajouter des fonctions aux
-    formes de base de pygame '''
 class Shape:
+    """
+        Represents a shape that can be drawn on pygame surface.
+        This class is intended to add functionality to the basic pygame shapes.
+    """
 
     def __init__(self):
         pass;

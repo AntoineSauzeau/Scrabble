@@ -21,39 +21,47 @@ class CaseType(IntEnum):
     LD = 3
 
 class Game():
+    """
+        Describes a scrabble game
+    """
 
     def __init__(self, l_player=[]):
 
-        self.l_player = l_player
-
+        #Bonus/Joker
         self.l_case_WT = [[0,0],[0,7],[0,14],[7,0],[7,14],[14,0],[14,7],[14,14]]
         self.l_case_WD = [[1,1],[1,13],[2,2],[2,12],[3,3],[3,11],[4,4],[4,10],[7,7],[10,4],[10,10],[11,3],[11,11],[12,2],[12,12],[13,1],[13,13]]
         self.l_case_LT = [[1,5],[1,9],[5,1],[5,5],[5,9],[5,13],[9,1],[9,5],[9,9],[9,13],[13,5],[13,9]]
         self.l_case_LD = [[0,3],[0,11],[2,6],[2,8],[3,0],[3,7],[3,14],[6,2],[6,6],[6,8],[6,12],[7,3],[7,11],[8,2],[8,6],[8,8],[8,12],[11,0],[11,7],[11,14],[12,6],[12,8],[14,3],[14,11]]
 
-        self.l_case_bonus_covered = [];
-        self.l_easel_case_to_renew = [];
-
-        self.played_time = 0;   #En seconde
-        self.n_round = 1;
-        self.player_index = 0;            #Stocke l'utilisateur qui joue
-        self.game_status = GameStatus.NotStarted;
-        self.last_round = False;
-        self.game_taken_up = False;
-        self.timer = None;
-
-        self.game_board = [];       #Liste à 2 dimensions représentant le placement des lettres sur le plateau de jeu
-        self.stack = [];
-        self.l_letter_information = {};
-
-        self.picking_mode = False;
+        self.l_case_bonus_covered = [];                 #We store the position of the covered bonus boxes in order not to apply their bonus later.
 
         self.l_joker_pos = [];
 
-        self.first_letter = True;
-        self.l_case_modified_during_round = [];
-        self.word_checker = WordChecker(self);
-        self.save_manager = SaveManager(self);
+        #Player/Easel
+        self.l_easel_case_to_renew = [];
+        self.l_player = l_player
+        self.player_index = 0;                  #Player who is playing
+        self.picking_mode = False;                  #True if the player is in the process of choosing letters to be replaced in his easel by other picked letters
+
+        #Game state
+        self.played_time = 0;                   #Time played in seconds
+        self.n_round = 1;
+        self.game_status = GameStatus.NotStarted;
+        self.last_round = False;
+        self.game_taken_up = False;                 #True if the game has been loaded from a backup
+        self.game_board = [];                   #Represents the game board of 15*15, contains the index in the alphabet of the letters laid down
+        self.first_letter = True;                   #True if no letter has been placed on the game board
+        self.timer = None;
+        self.l_case_modified_during_round = [];                 #List of the positions of the letters placed on the game board during the round
+
+        #Stack
+        self.stack = [];
+        self.l_letter_information = {};                 #Stores the number of each letter in the initial stack and their value.
+
+        #Stats
+        self.n_placed_letter = 0;
+        self.n_placed_word = 0;
+        self.n_scrabble = 0;
 
         self.stats = Stats(self);
 
@@ -61,16 +69,18 @@ class Game():
             self.stats.load();
 
 
-        self.n_placed_letter = 0;
-        self.n_placed_word = 0;
-        self.n_scrabble = 0;
+
+        self.word_checker = WordChecker(self);
+        self.save_manager = SaveManager(self);
 
         self.game_interface = None;
+
+
 
         for player in l_player:
             player.set_game_instance(self);
 
-        #On initialise les 225 cases du plateau à -1
+        #The 225 squares of the board are initialized at -1, i.e. empty, without letters.
         for x in range(15):
 
             x_list = [];
@@ -80,26 +90,35 @@ class Game():
             self.game_board.append(x_list);
 
         self.init_l_letter_information();
-
         self.init_stack();
 
 
     def start_game(self):
+        """
+            Starts the game
+        """
+
         self.game_status = GameStatus.InProgress;
 
         for player in self.l_player:
             player.set_game_instance(self);
 
+        #We fill the easel of each player
         for player in self.l_player:
             easel = player.get_easel();
             easel.fill();
 
+        #If we have just loaded a game at the launch of the game there may already be a letter of pose so we check
         if(self.game_board[7][7] != -1):
             self.first_letter = False;
 
         self.loop_timer();
 
     def loop_timer(self):
+        """
+            Called by the thread timer callback, it adds 1 second
+            to the elapsed time and restarts the timer
+        """
 
         if(self.game_status == GameStatus.Paused or self.game_status == GameStatus.Finished):
             return;
@@ -111,16 +130,27 @@ class Game():
         self.timer.start();
 
     def start_timer(self):
+        """
+            Start the timer
+        """
 
         self.timer = threading.Timer(1, self.loop_timer);
         self.timer.daemon = True;
         self.timer.start();
 
     def stop_timer(self):
+        """
+            Stop the Timer
+        """
+
         if(self.timer != None):
             self.timer.cancel();
 
     def add_letter_to_game_board(self, case_x, case_y, letter_index):
+        """
+            Adds the letter to the coordinates received by parameters
+            on the game board if this is allowed
+        """
 
         if(self.game_status == GameStatus.Paused or self.game_status == GameStatus.Finished):
             return False;
@@ -165,6 +195,9 @@ class Game():
         return True;
 
     def remove_letter_on_game_board(self, l_letter_pos):
+        """
+            Receive a list of letter positions on the game board and remove them.
+        """
 
         for letter_pos in l_letter_pos:
             letter_x = letter_pos[0];
@@ -177,6 +210,9 @@ class Game():
 
 
     def next_round(self):
+        """
+
+        """
 
         if(self.game_status == GameStatus.Finished):
             return;
@@ -301,6 +337,9 @@ class Game():
         self.l_letter_information["?"] = {"occ": 2, "val": 0}
 
     def init_stack(self):
+        """
+            Fill the stack and mix
+        """
 
         for i in range(26):
             letter = chr(65+i);
@@ -319,6 +358,9 @@ class Game():
         print(self.stack);
 
     def pick_a_letter(self):
+        """
+            Picks a letter from the stack and return it
+        """
 
         if(len(self.stack) == 0):
             return None;
@@ -329,6 +371,9 @@ class Game():
         return letter;
 
     def get_case_type(self, case_x, case_y):
+        """
+            Returns the type of the bonus case if there is one, otherwise returns None.
+        """
 
         for case in self.l_case_LT:
             if(case[0] == case_x and case[1] == case_y):
@@ -347,23 +392,28 @@ class Game():
                 return CaseType.WD;
 
     def is_case_bonus(self, case_x, case_y):
+        """
+            Returns True if the coordinates of the case correspond to those of a bonus case, False if not
+        """
 
         case_type = self.get_case_type(case_x, case_y);
 
         return (case_type == CaseType.LD or case_type == CaseType.LT or case_type == CaseType.WD or case_type == CaseType.WT);
 
 
-    #Renvoie True si on peut poser une lettre sur cette case
     def is_valid_case_for_play(self, case_x, case_y):
+        """
+            Return True if it is allowed to put a letter in this case, False if not.
+        """
 
-        #On fait attention à ce que la première lettre soit posé au milieu du plateau
+        #We check that the first letter is well placed in the centre of the game board
         if(self.first_letter == True):
             if(case_x != 7 or case_y != 7):
                 return False;
 
         print(self.l_case_modified_during_round);
 
-        #Le joueur a le droit de remplacer seulement les lettre posé pendant le tour actuel
+        #The player has the right to replace only the letters placed during the current round
         if(self.game_board[case_x][case_y] != -1):
             for i in range(len(self.l_case_modified_during_round)):
                 case_modified_pos = self.l_case_modified_during_round[i];
@@ -375,13 +425,18 @@ class Game():
                     return False;
 
         if(case_x != 7 or case_y != 7):
-            #On vérifie qu'il y ait bien une lettre sur une des 4 cases autour
+
+            #Check that there is a letter in one of the 4 cases around it.
             if(not(self.has_letter_around(case_x, case_y))):
                 return False;
 
         return True;
 
     def has_letter_around(self, case_x, case_y):
+        """
+            Returns True if there is at least one letter on one of the 4 cases
+            around the case given in parameters, False if this is not the situation
+       """
 
         if(case_x-1 != -1):
             if(self.game_board[case_x-1][case_y] != -1):
@@ -413,9 +468,13 @@ class Game():
         self.stats.load();
 
     def end_game(self):
+        """
+            Manages the end of the game, saves statistics, displays the winner, etc.
+        """
 
         self.game_status = GameStatus.Finished;
 
+        #We look at which player has an empty easel to see which one has finished the game.
         finisher_player = None;
         for player in self.l_player:
 
@@ -423,6 +482,8 @@ class Game():
             if(easel.empty()):
                 finisher_player = player;
 
+
+        #We apply end-of-game maluses and bonuses according to the letters remaining in the easel to the players' scores
         finisher_bonus = 0;
         for player in self.l_player:
 
@@ -444,10 +505,11 @@ class Game():
 
         finisher_player.add_score(finisher_bonus);
 
-
+        #If possible, we pick up the player with the highest score.
         winner = None;
         first_player_score = -1;
         second_player_score = -1;
+
         for player in self.l_player:
 
             player_score = player.get_score();
@@ -458,24 +520,21 @@ class Game():
 
                 winner = player;
 
-        #Egalité
+        #We look to see if there is equality
         if(first_player_score == second_player_score):
             winner = None;
 
         winner_name = winner.get_name();
         self.game_interface.show_message_end_game(winner_name, first_player_score);
 
-        #STATS
-
+        #We save the stats of the game in a file
         global_stats = self.stats.get_l_global_stats();
 
-        print(global_stats);
         global_stats["n_game"] += 1;
         global_stats["n_scrabble"] += self.n_scrabble;
         global_stats["n_placed_letter"] += self.n_placed_letter;
         global_stats["n_placed_word"] += self.n_placed_word;
         global_stats["time_played"] += self.played_time;
-        print(global_stats);
 
         l_player_stats = self.stats.get_l_player_stats();
         for player in self.l_player:
@@ -621,6 +680,9 @@ class Game():
 
 
 def get_played_time_formatted(played_time):
+    """
+        Formats a duration in seconds into a string like this 02:24:56
+    """
 
     second = played_time;
     minute = 0;

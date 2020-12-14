@@ -4,6 +4,9 @@ from datetime import datetime
 from player import Player
 
 class SaveManager:
+    """
+        Provides functions to load and save games
+    """
 
     def __init__(self, game=None):
 
@@ -12,6 +15,10 @@ class SaveManager:
         self.save_file_path = "save.json";
 
     def load_save(self, save_name):
+        """
+            Recovers the saved data and loads the game, i.e. it uses them
+            to put the game instance as it was when it was saved.
+        """
 
         try:
             file_save = open(self.save_file_path, "r");
@@ -61,6 +68,9 @@ class SaveManager:
         self.game.load_game();
 
     def create_save(self):
+        """
+            Creates a backup of a game from its game instance
+        """
 
         date = datetime.today();
 
@@ -118,6 +128,9 @@ class SaveManager:
         file_save.close();
 
     def remove_save(self, save_name):
+        """
+            Remove a backup in backup file
+        """
 
         try:
             file_save = open(self.save_file_path, "r");
@@ -136,12 +149,18 @@ class SaveManager:
         file_save.close();
 
     def reset(self):
+        """
+            Deletes all backups
+        """
 
         file_save = open(self.save_file_path, "w");
         file_save.write("{}");
 
 
     def get_l_save_name(self):
+        """
+            Returns the names of all players who have data saved in the backup file
+        """
 
         l_save_name = [];
 
@@ -161,5 +180,8 @@ class SaveManager:
 
         return l_save_name;
 
+
+
+    #GETTERS/SETTERS
     def set_game_instance(self, game):
         self.game = game;

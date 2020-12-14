@@ -1,12 +1,16 @@
 
 class Player:
+    """
+        Represent a player
+    """
 
     def __init__(self, name=""):
 
         self.name = name;
         self.score = 0;
-        self.easel = Easel(self);    #Stocke les lettres contenu dans le chevalet
+        self.easel = Easel(self); 
 
+        #Stats
         self.n_placed_letter = 0;
         self.n_placed_word = 0;
         self.n_scrabble = 0;
@@ -15,7 +19,7 @@ class Player:
         self.score += value;
 
 
-    #getters/setters
+    #GETTERS/SETTERS
     def get_score(self):
         return self.score;
 
@@ -57,14 +61,19 @@ class Player:
         self.easel.set_game_instance(game);
 
 class Easel:
+    """
+        Represent the easel of a player
+    """
 
     def __init__(self, player):
 
         self.player = player;
         self.l_letter = [-1, -1, -1, -1, -1, -1, -1];
 
-    #La fonction prend la liste des positions du chevalet à renouveller avec de nouvelles lettres piochées
     def renew_letter(self, easel_index):
+        """
+            Picks a letter and places it in the easel at the position indicated by parameters
+        """
 
             picked_letter = self.game.pick_a_letter();
 
@@ -81,6 +90,9 @@ class Easel:
             return picked_letter_index;
 
     def get_first_free_place(self):
+        """
+            Returns the first empty place in the easel
+        """
 
         for i in range(len(self.l_letter)):
 
@@ -89,17 +101,26 @@ class Easel:
                 return i;
 
     def renew_all(self):
+        """
+            Replace all the letters on the easel with new picked letters
+        """
 
         for i in range(7):
                 self.renew_letter(i);
 
     def fill(self):
+        """
+            Fill the easel with new letters at the empty spaces.
+        """
 
         for i in range(7):
             if(self.l_letter[i] == -1):
                 self.renew_letter(i);
 
     def count_total_value(self):
+        """
+            Returns the total value of the easel by adding up the value of all the letters in the easel
+        """
 
         l_letter_information = self.game.get_l_letter_information();
         easel_value = 0;
@@ -117,6 +138,9 @@ class Easel:
         return easel_value;
 
     def empty(self):
+        """
+            Returns True if the easel is empty
+        """
 
         for i in range(7):
             letter_index = self.l_letter[i];
@@ -126,6 +150,8 @@ class Easel:
         return True;
 
 
+
+    #GETTERS/SETTERS
     def get_l_letter(self):
         return self.l_letter;
 

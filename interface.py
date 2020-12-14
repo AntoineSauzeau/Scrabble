@@ -11,6 +11,10 @@ class Page(IntEnum):
 
 
 class Interface:
+    """
+        Directly manages the pygame interface and manages the display and events by calling
+        the draw and event methods of the classes representing the different pages of the interface.
+    """
 
     # CONSTANTES
     MENU_WINDOW_WIDTH = 379;
@@ -37,6 +41,9 @@ class Interface:
 
 
     def event(self, e):
+        """
+            Routes the events taking place to the event managers of the different pages
+        """
 
         if(self.page == Page.Menu):
             self.menu.event(e);
@@ -44,15 +51,20 @@ class Interface:
             self.game.event(e);
 
     def draw(self):
+        """
+            Draws the window by calling the different methods of the interface pages
+        """
+
         if(self.page == Page.Menu):
             self.menu.draw(self.window);
         elif(self.page == Page.Game):
             self.game.draw(self.window);
 
 
-
-
     def change_page(self, page):
+        """
+            Changes the displayed page of the interface and resizes the window according to the size of the page
+        """
 
         screen_width, screen_height = pyautogui.size();
 

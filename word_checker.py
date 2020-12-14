@@ -8,6 +8,9 @@ class Direction(IntEnum):
     Vertical = 1
 
 class WordChecker:
+    """
+        Provides functions to determine a word placed on the game board, whether it is valid and its total value.
+    """
 
     def __init__(self, game):
 

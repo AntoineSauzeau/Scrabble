@@ -24,42 +24,50 @@ class Page(IntEnum):
     SettingsMenu = 4
 
 class MenuInterface():
+    """
+        Manages the display and management of events in the menu window page
+    """
 
-    #Fonctions init
+    #Initialization functions
     def __init__(self, interface):
         print('Constructor Menu');
 
         self.interface = interface;
         self.page = Page.MainMenu;
 
-        self.save_manager = SaveManager();
-
+        #Widget
         self.l_button_by_page = [[], [], [], [], []];
         self.l_tew_by_page = [[], [], [], [], []];       #TextEditWidget
         self.l_tsw_by_page = [[], [], [], [], []];       #TextSwitchWidget
 
-        self.key_pressed = None;
+        self.key_pressed = None;                    #Last key of the keyboard pressed, allows to know that it letter add to the tew that has the focus
 
+        #Save
+        self.save_manager = SaveManager();
         self.n_save_per_page = 10;
         self.save_page_index = 0;
         self.index_save_selected = None;
         self.l_img_delete_save_rect = [];
         self.l_img_text_save_rect = [];
 
-        self.load_images();
+        #Stats
         self.stats = Stats();
 
         self.stats = Stats();
         self.stats.load();
 
+        #Settings
         self.settings_instance = None;
+
+
+        #Initialisation of the graphic elements
+        self.load_images();
 
         self.init_main_menu();
         self.init_game_menu();
         self.init_save_menu();
         self.init_stats_menu();
         self.init_settings_menu();
-
 
 
     def init_main_menu(self):
@@ -255,7 +263,7 @@ class MenuInterface():
 
 
 
-    #Fonctions draw
+    #Draw functions
     def draw(self, window):
 
         self.l_drawed_button = [];
@@ -762,6 +770,8 @@ class MenuInterface():
         return (x >= x_min and x <= x_max and y >= y_min and y <= y_max);
 
 
+
+    #GETTERS/SETTERS
     def change_page(self, page):
 
         self.page = page;

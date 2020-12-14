@@ -8,16 +8,19 @@ from button import Button
 from message import Message, Alignment
 from player import Player
 
-
 class Page(IntEnum):
     Game = 0,
     Save = 1
 
 class GameInterface():
+    """
+        Manages the display and management of events in the game window page
+    """
 
-    BOARD_SIZE = 550;
+    BOARD_SIZE = 550;                   #Size of the game board as it should be displayed on the interface and not of the original image
     BOARD_PADDING = 6;
 
+    #Initialization functions
     def __init__(self, interface, game):
 
         print("Constructor GameInterface");
@@ -27,11 +30,13 @@ class GameInterface():
         self.l_img_letter = [];
         self.l_message = [];
 
-        self.letter_moving_mode = False;
-        self.letter_moving_index = -1;
+        #Movement of letters
+        self.letter_moving_mode = False;                    #True if the player is moving a letter on the game interface
+        self.letter_moving_index = -1;                  #Index in the alphabet of the moving letter
 
-        self.joker_choice_mode = False;
-        self.l_joker_letter_choice_rect = [];
+        #Joker
+        self.joker_choice_mode = False;                 #True if the window for choosing the letter of the joker is displayed
+        self.l_joker_letter_choice_rect = [];                   #Dimensions and positions of the letters "buttons" which allow to choose the joker
 
         self.exit_after_save_window = False;
 
@@ -40,12 +45,17 @@ class GameInterface():
 
         self.page = Page.Game;
 
+        #Initialisation of the graphic elements
         self.init_game_page();
         self.init_save_page();
 
         self.load_images();
 
     def init_game_page(self):
+        """
+            Initialize the game page, create widgets like buttons that you put in a list
+            so you can manage their event and draw them later
+        """
 
         interface_width = self.interface.GAME_WINDOW_WIDTH;
         interface_height = self.interface.GAME_WINDOW_HEIGHT;
@@ -110,6 +120,10 @@ class GameInterface():
         self.l_message.append(self.message_end_game);
 
     def init_save_page(self):
+        """
+            Initialize the save page, create widgets like buttons that you put in a list
+            so you can manage their event and draw them later
+        """
 
         interface_width = self.interface.GAME_WINDOW_WIDTH;
         interface_height = self.interface.GAME_WINDOW_HEIGHT;
@@ -153,6 +167,9 @@ class GameInterface():
 
 
     def load_images(self):
+        """
+            Loads all images to avoid wasting time loading them later
+        """
 
         self.scrabble_board = pygame.image.load(os.path.join("Images", "scrabble_board.png"));
         self.scrabble_board = pygame.transform.scale(self.scrabble_board, (self.BOARD_SIZE, self.BOARD_SIZE));
@@ -176,12 +193,21 @@ class GameInterface():
         self.img_background_save = pygame.image.load(os.path.join("Images", "background_save.png"));
 
 
+
+
+    #Draw functions
     def draw(self, window):
+        """
+            Draws the game or save interface according to the current page
+            and refreshes the window.
+        """
 
         if(self.page == Page.Game):
             self.draw_game_page(window);
         elif(self.page == Page.Save):
             self.draw_save_page(window);
+
+        pygame.display.flip();
 
     def draw_game_page(self, window):
 
@@ -195,7 +221,7 @@ class GameInterface():
 
 
 
-        #PART DRAW BOARD
+        #DRAW BOARD
 
         board_x = interface_width/2-self.BOARD_SIZE/2;
         board_y = 21;
@@ -220,7 +246,7 @@ class GameInterface():
                     window.blit(img_letter, (img_letter_x, img_letter_y));
 
 
-        #PART DRAW EASEL
+        #DRAW EASEL
 
         del self.l_easel_case_rectangle[:];
 
@@ -281,7 +307,7 @@ class GameInterface():
                 window.blit(img_loop, (img_loop_x, img_loop_y));
 
 
-        #PART DRAW SCORE
+        #DRAW SCORE
 
         font = pygame.font.SysFont("", size=30);
         img_text_score = font.render("Score", True, (255, 255, 255));
@@ -303,7 +329,7 @@ class GameInterface():
             y+=25;
 
 
-        #PART DRAW BUTTONS
+        #DRAW BUTTONS
 
         for button in self.l_button_to_draw_by_page[self.page]:
             button.draw(window);
@@ -338,7 +364,7 @@ class GameInterface():
             window.blit(img_grid_mark, (img_x, img_y));
 
 
-        #PART DRAW TIME
+        #DRAW TIME
 
         font = pygame.font.SysFont("", size=25);
 
@@ -349,7 +375,7 @@ class GameInterface():
         window.blit(img_text_time_played, (10, 10));
 
 
-        #PART DRAW MENU
+        #DRAW MENU
 
         font = pygame.font.SysFont("", size=26);
         img_text_menu = font.render("Menu de jeu", True, (255, 255, 255));
@@ -471,8 +497,6 @@ class GameInterface():
 
 
 
-        pygame.display.flip();
-
     def draw_save_page(self, window):
 
         interface_width = self.interface.GAME_WINDOW_WIDTH;
@@ -492,10 +516,12 @@ class GameInterface():
         for button in self.l_button_to_draw_by_page[self.page]:
             button.draw(window);
 
-        pygame.display.flip();
 
 
     def set_pause(self, pause):
+        """
+            Pauses the game in progress or restarts it according to the parameter received
+        """
 
         game_status = self.game.get_game_status();
         if(game_status == GameStatus.NotStarted or game_status == GameStatus.Finished):
@@ -506,7 +532,6 @@ class GameInterface():
             self.bttn_pause.set_text("Reprendre la partie");
 
             self.game.stop_timer();
-            print("loop");
 
         elif(pause == False):
             self.game.set_game_status(GameStatus.InProgress);
@@ -515,6 +540,10 @@ class GameInterface():
             self.game.start_timer();
 
     def show_message_placed_word(self, word, value, player_name):
+        """
+            Displays a message in the middle of the screen with the word placed,
+            if it is valid and if so the number of points won
+        """
 
         interface_width = self.interface.GAME_WINDOW_WIDTH;
         interface_height = self.interface.GAME_WINDOW_HEIGHT;
@@ -542,6 +571,10 @@ class GameInterface():
         self.message_placed_word.show(3);
 
     def show_message_scrabble(self, player_name):
+        """
+            Displays a message in the middle of the screen indicating that the
+            player has played scrabble and the bonus points he has won
+        """
 
         interface_width = self.interface.GAME_WINDOW_WIDTH;
         interface_height = self.interface.GAME_WINDOW_HEIGHT;
@@ -565,6 +598,10 @@ class GameInterface():
         self.message_placed_word.add_queued_message(self.message_scrabble, 3);
 
     def show_message_pick_stack(self, player_name, l_letter_picked, n_letter_remained):
+        """
+            Displays a message in the middle of the screen with the picked letters
+            and the number of letters remaining in the stack
+        """
 
         interface_width = self.interface.GAME_WINDOW_WIDTH;
         interface_height = self.interface.GAME_WINDOW_HEIGHT;
@@ -588,6 +625,10 @@ class GameInterface():
         self.message_pick_stack.show(3);
 
     def show_message_save_loaded(self):
+        """
+            Displays a message in the middle of the screen indicating that
+            the saved game has been loaded.
+        """
 
         interface_width = self.interface.GAME_WINDOW_WIDTH;
         interface_height = self.interface.GAME_WINDOW_HEIGHT;
@@ -607,6 +648,10 @@ class GameInterface():
         self.message_pick_stack.show(3);
 
     def show_message_end_game(self, winner_name, winner_score):
+        """
+            Displays an end-of-game message in the middle of the screen
+            indicating either a tie with the score or the winner and his score.
+        """
 
         interface_width = self.interface.GAME_WINDOW_WIDTH;
         interface_height = self.interface.GAME_WINDOW_HEIGHT;
@@ -635,10 +680,14 @@ class GameInterface():
         self.message_placed_word.add_queued_message(self.message_end_game, 12);
 
     def event(self, e):
+        """
+            Manages keyboard, mouse, ... events
+        """
 
         interface_width = self.interface.GAME_WINDOW_WIDTH;
         interface_height = self.interface.GAME_WINDOW_HEIGHT;
 
+        #If the user clicks the cross to close the game window, the save window will open asking if he wish to save before exiting
         if(e.type == pygame.QUIT):
             self.page = Page.Save;
             self.exit_after_save_window = True;
@@ -650,7 +699,7 @@ class GameInterface():
 
             for button in self.l_button_to_draw_by_page[self.page]:
 
-                #Gestion du click sur les boutons
+                #Button click management
                 if(button.in_bounds(mouse_x, mouse_y)):
 
                     if(self.page == Page.Game):
@@ -708,6 +757,7 @@ class GameInterface():
 
                             menu_interface = self.interface.get_menu_interface();
 
+                            #Players are recreated from their usernames, useless to create a "reset" function.
                             l_player_to_reset = self.game.get_l_player();
 
                             l_player = [];
@@ -747,7 +797,7 @@ class GameInterface():
                             self.interface.change_page(0);
 
 
-                #Gestion du click au niveau du chevalet
+                #Easel click management
                 for i in range(len(self.l_easel_case_rectangle)):
 
                     easel_case_rectangle = self.l_easel_case_rectangle[i];
@@ -792,7 +842,7 @@ class GameInterface():
                                 self.letter_moving_index = -1;
 
 
-                #Gestion du click au niveau du plateau de jeu
+                #Game board click management
                 case_size = (self.BOARD_SIZE-self.BOARD_PADDING*2)/15;
                 for x_i in range(15):
                     for y_i in range(15):
@@ -828,6 +878,7 @@ class GameInterface():
             mouse_x = e.pos[0];
             mouse_y = e.pos[1];
 
+            #Management of clicks on the window of the joker's letter choice
             if(self.joker_choice_mode):
 
                 for button in self.l_button_to_draw_by_page[self.page]:
@@ -858,11 +909,15 @@ class GameInterface():
                 else:
                     button.remove_highlighting();
 
-    def change_page(self, page):
-        self.page = page;
 
+
+
+    #GETTERS/SETTERS
     def get_game_instance(self):
         return self.game;
 
     def set_game_instance(self, game_instance):
         self.game = game_instance;
+
+    def change_page(self, page):
+        self.page = page;

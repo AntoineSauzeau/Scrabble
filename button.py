@@ -1,6 +1,9 @@
 import pygame
 
 class Button():
+    """
+        Implements a graphic button that can be drawn on a pygame surface
+    """
 
     def __init__(self, text="", font="", pos=(0,0), text_size=20, color=(255, 255, 255)):
         pygame.sprite.Sprite.__init__(self);
@@ -20,6 +23,9 @@ class Button():
         self.background_color = None;
 
     def draw(self, window):
+        """
+            Draw the button on the window or on a pygame surface
+        """
 
         if(self.highlighted):
             color = self.h_color;
@@ -49,6 +55,9 @@ class Button():
 
 
     def highlight(self, scale, color):
+        """
+            Highlights the button, i.e. enlarges it or changes its colour from its basic state
+        """
 
         self.highlighted = True;
         if(color != None):
@@ -62,8 +71,10 @@ class Button():
     def remove_highlighting(self):
         self.highlighted = False;
 
-    #Renvoie true si les coordonnées sont dans la hitbox du bouton
     def in_bounds(self, x, y):
+        """
+            Returns True if the coordinates are within the frame of the button, returns False if not
+        """
 
         size = self.get_size();
 
@@ -76,6 +87,9 @@ class Button():
         return (x >= xmin and x <= xmax and y >= ymin and y <= ymax);
 
     def get_size(self):
+        """
+            Returns the size of the button
+        """
 
         if(self.highlighted):
             text_size = self.h_text_size;
@@ -89,6 +103,7 @@ class Button():
         button_size = (img_text_size[0]+self.padding*2, img_text_size[1]+self.padding*2);
 
         return button_size;
+
 
 
     #SETTERS/GETTERS

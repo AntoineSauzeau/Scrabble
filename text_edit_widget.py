@@ -3,6 +3,10 @@ from shape import Shape
 import time
 
 class TextEditWidget:
+    """
+        Represents a widget for editing text
+    """
+
     def __init__(self, text="", n_letter=10, pos=(15,15)):
 
         self.text = text;

@@ -6,8 +6,11 @@ import threading
 
 
 class Controller():
+    """
+        Manages the event/display loop, the pygame interface and catches fatal errors
+    """
 
-    FPS = 160
+    FPS = 160;
 
     def __init__(self):
 
@@ -17,6 +20,9 @@ class Controller():
 
 
     def start_loop(self):
+        """
+            Start the event/display loop
+        """
 
         clock = pygame.time.Clock();
         while(not(self.exit)):
@@ -28,20 +34,23 @@ class Controller():
 
                 self.interface.draw();
 
+            #If the user wants to close the program with Ctrl-C, we close him
             except KeyboardInterrupt:
                 self.quit();
+
 
             except Exception as err:
 
                 print(err);
 
-                #En cas de crash du programme on sauvegarde la partie si une partie était en cours
+                #For all other exceptions an attempt is made to save whether a game is in progress
                 game_interface = self.interface.get_game_interface();
                 if(game_interface != None):
 
                     game = game_interface.get_game_instance();
                     if(game != None):
                         game.create_save();
+
 
             clock.tick(self.FPS);
 
@@ -52,11 +61,5 @@ class Controller():
 
     def quit(self):
 
-        game_interface = self.interface.get_game_interface();
-        if(game_interface != None):
-            game_instance = game_interface.get_game_instance();
-            game_instance.stop_timer();
-
-
-        print("Fin du programme.")
+        print("Fin du programme.");
         self.exit = True;

@@ -1,6 +1,9 @@
 import json
 
 class Settings:
+    """
+        Represent settings data and provides functions for load and save them
+    """
 
     def __init__(self):
 

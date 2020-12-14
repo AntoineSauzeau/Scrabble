@@ -8,6 +8,9 @@ class Alignment(IntEnum):
     Right = 2
 
 class Message:
+    """
+        Represents a graphic message with a title and subtitle that can be drawn on a screen
+    """
 
     def __init__(self, text_title = "", pos=(0,0)):
 

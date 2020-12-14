@@ -2,6 +2,9 @@ import os
 import pygame
 
 class TextSwitchWidget:
+    """
+        Represents a widget allowing to choose a value from a string list using 2 arrows
+    """
 
     def __init__(self, text_size=30, pos=(0,0), l_value=[]):
 
