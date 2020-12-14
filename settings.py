@@ -18,6 +18,9 @@ class Settings:
 
 
     def save(self):
+        """
+            Save settings to a file
+        """
 
         file_settings = open(self.settings_file_path, "w");
         json.dump(self.settings, file_settings);

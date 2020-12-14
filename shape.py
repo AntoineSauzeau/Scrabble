@@ -29,6 +29,9 @@ class Shape:
         self.width = width;
 
     def draw(self):
+        """
+            Draws the shape on a pygame surface
+        """
 
         if(self.type == ShapeType.Rectangle):
             pygame.draw.rect(self.surface, self.color, self.rect, self.width);

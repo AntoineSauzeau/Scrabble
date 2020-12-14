@@ -1,1 +1,1 @@
-{"l_global_stats": {}, "l_player_stats": {}}
+{"l_global_stats": {"n_game": 1, "n_scrabble": 0, "time_played": 3202, "n_placed_word": 15, "n_placed_letter": 53}, "l_player_stats": {"alexandre": {"n_win": 1, "n_lose": 0, "n_scrabble": 0, "time_played": 3202, "n_placed_word": 8, "n_placed_letter": 29}, "valentin": {"n_win": 0, "n_lose": 1, "n_scrabble": 0, "time_played": 3202, "n_placed_word": 7, "n_placed_letter": 24}}}

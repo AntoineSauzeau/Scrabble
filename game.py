@@ -210,9 +210,6 @@ class Game():
 
 
     def next_round(self):
-        """
-
-        """
 
         if(self.game_status == GameStatus.Finished):
             return;

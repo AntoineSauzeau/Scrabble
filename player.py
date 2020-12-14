@@ -8,7 +8,7 @@ class Player:
 
         self.name = name;
         self.score = 0;
-        self.easel = Easel(self); 
+        self.easel = Easel(self);
 
         #Stats
         self.n_placed_letter = 0;
@@ -75,19 +75,19 @@ class Easel:
             Picks a letter and places it in the easel at the position indicated by parameters
         """
 
-            picked_letter = self.game.pick_a_letter();
+        picked_letter = self.game.pick_a_letter();
 
-            if(picked_letter == None):
-                self.l_letter[easel_index] = -1;
-                return None;
+        if(picked_letter == None):
+            self.l_letter[easel_index] = -1;
+            return None;
 
-            if(picked_letter != "?"):
-                picked_letter_index = ord(picked_letter)-65;
-            else:
-                picked_letter_index = 26;
+        if(picked_letter != "?"):
+            picked_letter_index = ord(picked_letter)-65;
+        else:
+            picked_letter_index = 26;
 
-            self.l_letter[easel_index] = picked_letter_index;
-            return picked_letter_index;
+        self.l_letter[easel_index] = picked_letter_index;
+        return picked_letter_index;
 
     def get_first_free_place(self):
         """

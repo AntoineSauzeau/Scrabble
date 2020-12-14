@@ -873,6 +873,28 @@ class GameInterface():
                                     self.letter_moving_index = -1;
 
 
+                            elif(e.button == 2 or e.button == 3):
+
+                                l_case_modified_during_round = self.game.get_l_case_modified_during_round();
+                                if((x_i, y_i) in l_case_modified_during_round):
+
+                                    l_case_modified_during_round.remove((x_i, y_i));
+                                    game_board = self.game.get_game_board();
+
+                                    letter_index = game_board[x_i][y_i];
+                                    game_board[x_i][y_i] = -1;
+
+                                    player = self.game.get_player_turn();
+                                    player_easel = player.get_easel();
+
+                                    index_free_case = player_easel.get_first_free_place();
+
+                                    easel_l_value = player_easel.get_l_letter();
+                                    easel_l_value[index_free_case] = letter_index;
+
+
+
+
         elif(e.type == pygame.MOUSEBUTTONDOWN):
 
             mouse_x = e.pos[0];
