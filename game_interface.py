@@ -2,10 +2,11 @@ from enum import IntEnum
 import pygame
 import os
 
-from game import GameStatus
+from game import GameStatus, get_played_time_formatted
 from shape import Shape
 from button import Button
 from message import Message, Alignment
+from player import Player
 
 
 class Page(IntEnum):
@@ -340,7 +341,9 @@ class GameInterface():
         #PART DRAW TIME
 
         font = pygame.font.SysFont("", size=25);
-        text_time_played = self.game.get_played_time_formatted();
+
+        played_time = self.game.get_played_time();
+        text_time_played = get_played_time_formatted(played_time);
 
         img_text_time_played = font.render(text_time_played, True, (255, 255, 255));
         window.blit(img_text_time_played, (10, 10));
@@ -631,7 +634,6 @@ class GameInterface():
 
         self.message_placed_word.add_queued_message(self.message_end_game, 12);
 
-
     def event(self, e):
 
         interface_width = self.interface.GAME_WINDOW_WIDTH;
@@ -697,6 +699,25 @@ class GameInterface():
 
                         elif(button.get_text() == "Passer au tour suivant"):
                             self.game.next_round();
+
+                            game_status = self.game.get_game_status();
+                            if(game_status == GameStatus.Finished):
+                                self.bttn_next_round.set_text("Refaire une partie ?");
+
+                        elif(button.get_text() == "Refaire une partie ?"):
+
+                            menu_interface = self.interface.get_menu_interface();
+
+                            l_player_to_reset = self.game.get_l_player();
+
+                            l_player = [];
+                            for player in l_player_to_reset:
+
+                                player_name = player.get_name();
+                                player = Player(player_name);
+                                l_player.append(player);
+
+                            menu_interface.replay_game(l_player);
 
                     elif(self.page == Page.Save):
 
@@ -842,3 +863,6 @@ class GameInterface():
 
     def get_game_instance(self):
         return self.game;
+
+    def set_game_instance(self, game_instance):
+        self.game = game_instance;

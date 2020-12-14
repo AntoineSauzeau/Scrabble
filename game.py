@@ -117,7 +117,8 @@ class Game():
         self.timer.start();
 
     def stop_timer(self):
-        self.timer.cancel();
+        if(self.timer != None):
+            self.timer.cancel();
 
     def add_letter_to_game_board(self, case_x, case_y, letter_index):
 
@@ -216,7 +217,7 @@ class Game():
 
                 self.n_placed_letter += len(self.l_case_modified_during_round);
                 n_player_placed_letter = player.get_n_placed_letter();
-                player.set_n_placed_letter(n_player_placed_letter+1);
+                player.set_n_placed_letter(n_player_placed_letter+len(self.l_case_modified_during_round));
 
 
 
@@ -501,40 +502,11 @@ class Game():
     def get_l_player(self):
         return self.l_player;
 
-    def get_played_time_formatted(self):
-
-        second = self.played_time;
-        minute = 0;
-        hour = 0;
-
-        if(second // 3600):
-            hour = second // 3600;
-            second -= hour * 3600;
-
-        if(second // 60):
-            minute = second // 60;
-            second -= minute * 60;
-
-        if(second < 10):
-            second_text = "0" + str(second);
-        else:
-            second_text = str(second);
-
-        if(minute < 10):
-            minute_text = "0" + str(minute);
-        else:
-            minute_text = str(minute);
-
-        if(hour < 10):
-            hour_text = "0" + str(hour);
-        else:
-            hour_text = str(hour);
-
-        played_time_formatted = hour_text + ":" + minute_text + ":" + second_text;
-
-        return played_time_formatted;
-
     def get_player_turn(self):
+
+        if(self.player_index >= len(self.l_player)):
+            return None;
+
         return self.l_player[self.player_index];
 
     def get_game_status(self):
@@ -644,3 +616,39 @@ class Game():
 
     def set_n_scrabble(self, n_scrabble):
         self.n_scrabble = n_scrabble;
+
+
+
+
+def get_played_time_formatted(played_time):
+
+    second = played_time;
+    minute = 0;
+    hour = 0;
+
+    if(second // 3600):
+        hour = second // 3600;
+        second -= hour * 3600;
+
+    if(second // 60):
+        minute = second // 60;
+        second -= minute * 60;
+
+    if(second < 10):
+        second_text = "0" + str(second);
+    else:
+        second_text = str(second);
+
+    if(minute < 10):
+        minute_text = "0" + str(minute);
+    else:
+        minute_text = str(minute);
+
+    if(hour < 10):
+        hour_text = "0" + str(hour);
+    else:
+        hour_text = str(hour);
+
+    played_time_formatted = hour_text + ":" + minute_text + ":" + second_text;
+
+    return played_time_formatted;

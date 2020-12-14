@@ -8,7 +8,7 @@ import os
 import math
 
 from button import Button
-from game import Game
+from game import Game, get_played_time_formatted
 from player import Player
 from text_edit_widget import TextEditWidget
 from text_switch_widget import TextSwitchWidget
@@ -461,7 +461,10 @@ class MenuInterface():
         text_n_scrabble = "Nombre de scrabble : " + str(l_global_stats["n_scrabble"]);
         text_n_placed_letter = "Nombre de lettres placées : " + str(l_global_stats["n_placed_letter"]);
         text_n_placed_word = "Nombre de mots placés : " + str(l_global_stats["n_placed_word"]);
-        text_played_time = "Temps joué : " + str(l_global_stats["time_played"]);
+
+        time_played = l_global_stats["time_played"];
+        time_played_formatted = get_played_time_formatted(time_played);
+        text_played_time = "Temps joué : " + time_played_formatted;
 
         img_text_n_game = font.render(text_n_game, True, (255, 255, 255));
         img_text_n_scrabble = font.render(text_n_scrabble, True, (255, 255, 255));
@@ -516,7 +519,9 @@ class MenuInterface():
         text_n_scrabble = "Nombre de scrabble : " + str(n_scrabble);
         text_n_placed_letter = "Nombre de lettre posée : " + str(n_placed_letter);
         text_n_placed_word = "Nombre de mot posé : " + str(n_placed_word);
-        text_time_played = "Temps joué : " + str(time_played);
+
+        time_played_formatted = get_played_time_formatted(time_played);
+        text_time_played = "Temps joué : " + time_played_formatted;
 
         font = pygame.font.SysFont("", size=26);
 
@@ -548,7 +553,7 @@ class MenuInterface():
         interface_height = self.interface.MENU_WINDOW_HEIGHT;
 
         background_rect = (0, 0, interface_width, interface_height);
-        pygame.draw.rect(window, (123, 62, 25), background_rect);
+        pygame.draw.rect(window, (49, 87, 44), background_rect);
 
         font = pygame.font.SysFont("", size=33);
 
@@ -583,6 +588,13 @@ class MenuInterface():
         self.img_red_cross = pygame.image.load(os.path.join("Images", "red_cross.png"))
         self.img_red_cross = pygame.transform.scale(self.img_red_cross, (15, 15));
 
+    def replay_game(self, l_player):
+
+        game = Game(l_player);
+        self.interface.create_game_interface(game);
+
+        game_interface = self.interface.get_game_interface();
+        game.set_game_interface_instance(game_interface);
 
 
     #Fonctions event
@@ -656,6 +668,7 @@ class MenuInterface():
 
                     elif(button.get_text() == "Réinitialiser"):
                         self.stats.reset();
+                        self.stats.load();
 
                     elif(button.get_text() == "Tout supprimer"):
                         self.save_manager.reset();

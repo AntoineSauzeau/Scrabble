@@ -49,7 +49,7 @@ class Player:
     def set_n_placed_word(self, n_placed_word):
         self.n_placed_word = n_placed_word;
 
-    def set_n_scrabble(self, scrabble):
+    def set_n_scrabble(self, n_scrabble):
         self.n_scrabble = n_scrabble
 
     def set_game_instance(self, game):
