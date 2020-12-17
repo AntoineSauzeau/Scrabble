@@ -240,6 +240,8 @@ class Game():
                 if(len(self.l_case_modified_during_round) == 7):
                     self.game_interface.show_message_scrabble(player_name);
 
+                    player.add_score(50);
+
                     self.n_scrabble += 1;
                     n_player_scrabble = player.get_n_scrabble();
                     n_player_scrabble += 1;
