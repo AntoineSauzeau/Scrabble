@@ -9,5 +9,6 @@ Avec pip :
 ```pip install pygame pyautogui```
 
 # Aperçu rapide
-![alt text](https://github.com/AntoineSauzeau/Scrabble/blob/master/Images/README/readme_screen_2.PNG?raw=true)
-![alt text](https://github.com/AntoineSauzeau/Scrabble/blob/master/Images/README/readme_screen_1.PNG?raw=true)
+![Menu](https://github.com/AntoineSauzeau/Scrabble/blob/main/Images/README/readme_screen_2.PNG)
+
+![En jeu](https://github.com/AntoineSauzeau/Scrabble/blob/main/Images/README/readme_screen_1.PNG)
