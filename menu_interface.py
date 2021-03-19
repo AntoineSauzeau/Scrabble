@@ -454,7 +454,7 @@ class MenuInterface():
         pygame.draw.rect(window, (105, 56, 92), background_rect);
 
         font = pygame.font.SysFont("", size=32);
-        img_text_global_stats = font.render("Statistiques globaux", True, (255, 255, 255));
+        img_text_global_stats = font.render("Statistiques globales", True, (255, 255, 255));
 
         img_text_global_stats_size = img_text_global_stats.get_size();
         img_text_global_stats_x = interface_width/2-img_text_global_stats_size[0]/2;
@@ -522,7 +522,7 @@ class MenuInterface():
             n_placed_word = player_stats["n_placed_word"];
             time_played = player_stats["time_played"];
 
-        text_n_win = "Nombre de partie gagné : " + str(n_win);
+        text_n_win = "Nombre de partie gagnée : " + str(n_win);
         text_n_lose = "Nombre de partie perdu : " + str(n_lose);
         text_n_scrabble = "Nombre de scrabble : " + str(n_scrabble);
         text_n_placed_letter = "Nombre de lettre posée : " + str(n_placed_letter);

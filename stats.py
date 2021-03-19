@@ -36,7 +36,6 @@ class Stats:
 
                 self.init_player_stats(player_name);
 
-                #self.l_player_stats[player_name] = {};
                 self.l_player_stats[player_name]["n_win"] = player_stats["n_win"];
                 self.l_player_stats[player_name]["n_lose"] = player_stats["n_lose"];
                 self.l_player_stats[player_name]["n_scrabble"] = player_stats["n_scrabble"];
@@ -97,7 +96,14 @@ class Stats:
 
         file_stats.close();
 
-        self.load();
+        self.l_global_stats = {};
+        self.l_global_stats["n_game"] = 0;
+        self.l_global_stats["n_scrabble"] = 0;
+        self.l_global_stats["time_played"] = 0;
+        self.l_global_stats["n_placed_word"] = 0;
+        self.l_global_stats["n_placed_letter"] = 0;
+
+        self.l_player_stats = {};
 
 
     def get_player_stats(self, player_name):
